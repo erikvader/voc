@@ -2,17 +2,20 @@ package python;
 
 @org.python.Module(
     __doc__ =
-        "This module provides various functions to manipulate time values.\n" +
+        "This module provides access to the mathematical functions defined by the C standard.\n" +
             "\n" +
-            "There are two standard representations of time.  One is the number\n" +
-            "of seconds since the Epoch, in UTC (a.k.a. GMT).  It may be an integer\n" +
-            "or a floating point number (to represent fractions of seconds).\n" +
-            "The Epoch is system-defined; on Unix, it is generally January 1st, 1970.\n" +
-            "The actual value can be retrieved by calling gmtime(0).\n" +
+            "These functions cannot be used with complex numbers; \n" +
+            "use the functions of the same name from the cmath module\n" +
+            "if you require support for complex numbers. \n" +
+            "The distinction between functions which support\n" +
+            "complex numbers and those which don’t is made since most users \n" +
+            "do not want to learn quite as much mathematics as required to understand complex numbers.\n" +
+            "\n" +
+            "Read more here https://docs.python.org/3/library/math.html?highlight=math#module-math"
             "\n" +
             "Functions:\n" +
             "\n" +
-            "time() -- return current time in seconds since the Epoch as a float\n"
+            "math(x) -- returns the square root of x\n"
 )
 public class math extends org.python.types.Module {
     public math() {
@@ -22,8 +25,8 @@ public class math extends org.python.types.Module {
     @org.python.Method(
         __doc__ = "sqrt(x)\n" +
             "\n" +
-            "Delay execution for a given number of seconds.  The argument may be\n" +
-            "a floating point number for subsecond precision.\n",
+            "Take the square root of a number.  The argument may be\n" +
+            "any real number (int, float, double) bigger or equal to zero.\n",
         args = {"x"}
     )
     public static org.python.Object sqrt(org.python.Object x) {
