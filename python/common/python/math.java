@@ -11,7 +11,7 @@ package python;
             "complex numbers and those which don’t is made since most users \n" +
             "do not want to learn quite as much mathematics as required to understand complex numbers.\n" +
             "\n" +
-            "Read more here https://docs.python.org/3/library/math.html?highlight=math#module-math"
+            "Read more here https://docs.python.org/3/library/math.html?highlight=math#module-math" +
             "\n" +
             "Functions:\n" +
             "\n" +
