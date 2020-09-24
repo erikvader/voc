@@ -12,7 +12,7 @@ public class DateTime extends org.python.types.Object {
     private final int MICROSECOND_INDEX = 6;
 
     private final int MIN_YEAR = 1;
-    private final int MAX_YEAR = 999;
+    private final int MAX_YEAR = 9999;
 
     private Long[] timeUnits = { 0l, 0l, 0l, 0l, 0l, 0l, 0l };
 
@@ -88,7 +88,7 @@ public class DateTime extends org.python.types.Object {
 	    throw new org.python.exceptions.ValueError("second " + this.timeUnits[SECOND_INDEX] + "is out of range");
 	}
 
-	if (this.timeUnits[MICROSECOND_INDEX] < 0 || this.timeUnits[MICROSECOND_INDEX] > 100000) {
+	if (this.timeUnits[MICROSECOND_INDEX] < 0 || this.timeUnits[MICROSECOND_INDEX] > 1000000) {
 	    throw new org.python.exceptions.ValueError("microsecond " + this.timeUnits[MICROSECOND_INDEX] + "is out of range");
 	}
 
@@ -153,38 +153,38 @@ public class DateTime extends org.python.types.Object {
     }
 
     @org.python.Method(__doc__ = "returns year")
-    public org.python.types.Str __year__() {
-	return new org.python.types.Str(this.timeUnits[YEAR_INDEX] + "");
+    public org.python.types.Int __year__() {
+	return org.python.types.Int.getInt(this.timeUnits[YEAR_INDEX]);
     }
 
     @org.python.Method(__doc__ = "returns month")
-    public org.python.types.Str __month__() {
-	return new org.python.types.Str(this.timeUnits[MONTH_INDEX] + "");
+    public org.python.types.Int __month__() {
+	return org.python.types.Int.getInt(this.timeUnits[MONTH_INDEX]);
     }
 
     @org.python.Method(__doc__ = "returns day")
-    public org.python.types.Str __day__() {
-	return new org.python.types.Str(this.timeUnits[DAY_INDEX] + "");
+    public org.python.types.Int __day__() {
+	return org.python.types.Int.getInt(this.timeUnits[DAY_INDEX]);
     }
 
     @org.python.Method(__doc__ = "returns hour")
-    public org.python.types.Str __hour__() {
-	return new org.python.types.Str(this.timeUnits[HOUR_INDEX] + "");
+    public org.python.types.Int __hour__() {
+	return org.python.types.Int.getInt(this.timeUnits[HOUR_INDEX]);
     }
 
     @org.python.Method(__doc__ = "returns minute")
-    public org.python.types.Str __minute__() {
-	return new org.python.types.Str(this.timeUnits[MINUTE_INDEX] + "");
+    public org.python.types.Int __minute__() {
+	return org.python.types.Int.getInt(this.timeUnits[MINUTE_INDEX]);
     }
 
     @org.python.Method(__doc__ = "returns second")
-    public org.python.types.Str __second__() {
-	return new org.python.types.Str(this.timeUnits[SECOND_INDEX] + "");
+    public org.python.types.Int __second__() {
+	return org.python.types.Int.getInt(this.timeUnits[SECOND_INDEX]);
     }
 
     @org.python.Method(__doc__ = "returns microsecond")
-    public org.python.types.Str __microsecond__() {
-	return new org.python.types.Str(this.timeUnits[MICROSECOND_INDEX] + "");
+    public org.python.types.Int __microsecond__() {
+	return org.python.types.Int.getInt(this.timeUnits[MICROSECOND_INDEX]);
     }
 
     @org.python.Method(__doc__ = "")
