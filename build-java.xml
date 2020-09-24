@@ -5,12 +5,15 @@
 
   <target name="compile" description="Compile the Oracle-specific source">
     <mkdir dir="${build}/java"/>
+    <mkdir dir="${build}/test"/>
     <javac debug="true"
            debuglevel="lines,vars,source"
            includeantruntime="false"
+           classpath="lib/junit-4.13.jar"
            destdir="${build}/java">
-      <src path="${src}/common" />
-      <src path="${src}/java" />
+      <src path="${src}/common"/>
+      <src path="${src}/java"/>
+      <src path="${src}/../tests/java/junit"/>
     </javac>
   </target>
 
@@ -25,13 +28,13 @@
   <target name="compile-testdaemon" depends="compile" description="Compile the testdaemon source">
     <mkdir dir="${build}/java-testdaemon"/>
     <javac debug="true"
-           debuglevel="lines,vars,source"
-           includeantruntime="false"
-           source="1.7"
-           target="1.7"
-           destdir="${build}/java-testdaemon">
-      <src path="${src}/testdaemon" />
-      <classpath path="${build}/java" />
+         debuglevel="lines,vars,source"
+         includeantruntime="false"
+         source="1.7"
+         target="1.7"
+         destdir="${build}/java-testdaemon">
+      <src path="${src}/testdaemon"/>
+      <classpath path="${build}/java"/>
     </javac>
   </target>
 
@@ -39,26 +42,42 @@
     <mkdir dir="${dist}"/>
 
     <jar jarfile="${dist}/Python-${python-version}-Java-support.b${release}.jar"
-         basedir="${build}/java" />
+       basedir="${build}/java"/>
 
     <copy tofile="${dist}/python-java-support.jar"
-          file="${dist}/Python-${python-version}-Java-support.b${release}.jar"
-          overwrite="true" />
+        file="${dist}/Python-${python-version}-Java-support.b${release}.jar"
+        overwrite="true"/>
   </target>
 
   <target name="dist-testdaemon" depends="compile-testdaemon" description="Generate testdaemon jar file">
     <mkdir dir="${dist}"/>
 
     <jar jarfile="${dist}/Python-${python-version}-Java-testdaemon.b${release}.jar"
-         basedir="${build}/java-testdaemon" />
+       basedir="${build}/java-testdaemon"/>
 
     <copy tofile="${dist}/python-java-testdaemon.jar"
-          file="${dist}/Python-${python-version}-Java-testdaemon.b${release}.jar"
-          overwrite="true" />
+        file="${dist}/Python-${python-version}-Java-testdaemon.b${release}.jar"
+        overwrite="true"/>
   </target>
 
   <target name="clean" description="Clean up">
     <delete dir="${build}"/>
     <delete dir="${dist}"/>
   </target>
+
+  <junit printsummary="yes" haltonfailure="no" showoutput="yes">
+    <classpath>
+      <pathelement location="lib/hamcrest-core-1.3.jar"/>
+      <pathelement location="lib/junit-4.13.jar"/>
+      <pathelement location="${build}/java"/>
+    </classpath>
+
+    <formatter type="plain"/>
+
+    <batchtest fork="yes" todir="build/java">
+      <fileset dir="tests/java">
+        <include name="**/*Test.java"/>
+      </fileset>
+    </batchtest>
+  </junit>
 </project>
