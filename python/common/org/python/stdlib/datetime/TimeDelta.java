@@ -1,15 +1,34 @@
 package org.python.stdlib.datetime;
 
-import org.python.exceptions.ValueError;
-import org.python.types.Float;
-
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class TimeDelta extends org.python.types.Object {
+    public static final Map<String, org.python.Object> EMPTY_KWARGS = Collections.unmodifiableMap(new HashMap<>());
+    public static final org.python.Object[] EMPTY_ARGS = {};
+
+    public static final int SECONDS_PER_DAY = 3600 * 24;
+    public static final int MAX_DAYS = 999999999;
+
+    private static final TimeDelta minDelta;
+    private static final TimeDelta maxDelta;
+
+    static {
+        minDelta = new TimeDelta(EMPTY_ARGS, EMPTY_KWARGS);
+        minDelta.days = org.python.types.Int.getInt(-MAX_DAYS);
+
+        maxDelta = new TimeDelta(EMPTY_ARGS, EMPTY_KWARGS);
+        maxDelta.days = org.python.types.Int.getInt(MAX_DAYS);
+        maxDelta.seconds = org.python.types.Int.getInt(86399);
+        maxDelta.microseconds = org.python.types.Int.getInt(999999);
+    }
 
     @org.python.Attribute
     public org.python.Object days = __days__();
@@ -27,11 +46,13 @@ public class TimeDelta extends org.python.types.Object {
     @org.python.Attribute
     public static org.python.Object resolution = __resolution__();
 
-    public long totalNanoseconds = 0;
+    private Duration duration;
 
     @org.python.Method(__doc__ = "")
     public TimeDelta(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super();
+
+        duration = Duration.ZERO;
 
         this.days = org.python.types.Int.getInt(0);
         this.seconds = org.python.types.Int.getInt(0);
@@ -45,10 +66,8 @@ public class TimeDelta extends org.python.types.Object {
         String[] allowed = {"days", "seconds", "microseconds", "milliseconds", "minutes", "hours", "weeks"};
         List<String> allowedList = Arrays.asList(allowed);
         if (!kwargs.isEmpty()) {
-            boolean correct = true;
             for (java.lang.String key : kwargs.keySet()) {
-                correct = allowedList.contains(key);
-                if (!correct) {
+                if (!allowedList.contains(key)) {
                     throw new org.python.exceptions.TypeError("'" + key + "' is an invalid keyword argument for __new__()");
                 }
             }
@@ -80,59 +99,53 @@ public class TimeDelta extends org.python.types.Object {
         }
 
         if (args.length >= 1) {
-            addDays(args[0]);
+            addDays(getDouble("days", args[0]));
         }
         if (args.length >= 2) {
-            addSeconds(args[1]);
+            addSeconds(getDouble("seconds", args[1]));
         }
         if (args.length >= 3) {
-            addMicroseconds(args[2]);
+            addMicroseconds(getDouble("microseconds", args[2]));
         }
         if (args.length >= 4) {
-            addMilliseconds(args[3]);
+            addMilliseconds(getDouble("milliseconds", args[3]));
         }
         if (args.length >= 5) {
-            addMinutes(args[4]);
+            addMinutes(getDouble("minutes", args[4]));
         }
         if (args.length >= 6) {
-            addHours(args[5]);
+            addHours(getDouble("hours", args[5]));
         }
         if (args.length >= 7) {
-            addWeeks(args[6]);
+            addWeeks(getDouble("weeks", args[6]));
         }
 
         if (kwargs.get("days") != null) {
-            addDays(kwargs.get("days"));
+            addDays(getDouble("days", kwargs.get("days")));
         }
         if (kwargs.get("seconds") != null) {
-            addSeconds(kwargs.get("seconds"));
+            addSeconds(getDouble("seconds", kwargs.get("seconds")));
         }
         if (kwargs.get("microseconds") != null) {
-            addMicroseconds(kwargs.get("microseconds"));
+            addMicroseconds(getDouble("microseconds", kwargs.get("microseconds")));
         }
         if (kwargs.get("milliseconds") != null) {
-            addMilliseconds(kwargs.get("milliseconds"));
+            addMilliseconds(getDouble("milliseconds", kwargs.get("milliseconds")));
         }
         if (kwargs.get("minutes") != null) {
-            addMinutes(kwargs.get("minutes"));
+            addMinutes(getDouble("minutes", kwargs.get("minutes")));
         }
         if (kwargs.get("hours") != null) {
-            addHours(kwargs.get("hours"));
+            addHours(getDouble("hours", kwargs.get("hours")));
         }
         if (kwargs.get("weeks") != null) {
-            addWeeks(kwargs.get("weeks"));
+            addWeeks(getDouble("weeks", kwargs.get("weeks")));
         }
 
-        Duration duration = Duration.ofNanos(totalNanoseconds);
-        long totalDays = duration.toDays();
-        this.days = org.python.types.Int.getInt(totalDays);
-        Duration durationSeconds = duration.minusDays(totalDays);
-        long totalSeconds = durationSeconds.toSeconds();
-        this.seconds = org.python.types.Int.getInt(totalSeconds);
-        this.microseconds = org.python.types.Int.getInt(durationSeconds.minusSeconds(totalSeconds).toNanos() / 1000);
+        normalize();
     }
 
-    private double getDouble(org.python.Object object, String key) {
+    private double getDouble(String key, org.python.Object object) {
         try {
             return ((org.python.types.Float) object.__float__()).value;
         } catch (Exception ignored) {
@@ -142,110 +155,211 @@ public class TimeDelta extends org.python.types.Object {
         }
     }
 
-    private void addDays(org.python.Object days) {
-        double value = getDouble(days, "days");
-        totalNanoseconds += value * 24 * 60 * 60 * 1e9;
+    private void normalize() {
+        double totalMicroseconds;
+        long totalDays = duration.toDays();
+        long totalSeconds;
+        long roundedMicroseconds;
+        long daysMagnitude = Math.abs(totalDays);
+
+        if (duration.isNegative()) {
+            // Handle negative durations
+            long fullDays = duration.minusDays(totalDays).isZero() ? daysMagnitude : (daysMagnitude + 1);
+            Duration negative = Duration.ofDays(fullDays).plus(duration.minusDays(totalDays));
+
+            Duration withoutDays = negative.minusDays(negative.toDays());
+            Duration withoutSeconds = withoutDays.minusSeconds(withoutDays.toSeconds());
+
+            totalDays = -fullDays;
+            totalSeconds = withoutDays.toSeconds();
+            totalMicroseconds = withoutSeconds.toNanos() / 1000.0;
+        } else {
+            Duration withoutDays = duration.minusDays(totalDays);
+            totalSeconds = withoutDays.toSeconds();
+
+            Duration withoutSeconds = withoutDays.minusSeconds(totalSeconds);
+            totalMicroseconds = withoutSeconds.toNanos() / 1000.0;
+        }
+
+        // Round microseconds using round-half-to-even
+        roundedMicroseconds = BigDecimal.valueOf(totalMicroseconds)
+            .setScale(0, RoundingMode.HALF_EVEN)
+            .longValue();
+
+        // Check days magnitude is within limits
+        if (daysMagnitude >= MAX_DAYS) {
+            throw new org.python.exceptions.OverflowError("days=" + totalDays + "; must have magnitude <= " + MAX_DAYS);
+        }
+
+        // Store values
+        this.days = org.python.types.Int.getInt(totalDays);
+        this.seconds = org.python.types.Int.getInt(totalSeconds);
+        this.microseconds = org.python.types.Int.getInt(roundedMicroseconds);
     }
-    private void addSeconds(org.python.Object seconds) {
-        double value = getDouble(seconds, "seconds");
-        totalNanoseconds += value * 1e9;
+
+    private void addDays(double days) {
+        long fullDays = (long) days;
+        duration = duration.plusDays(fullDays);
+        double seconds = (days - fullDays) * SECONDS_PER_DAY;
+        addSeconds(seconds);
     }
-    private void addMicroseconds(org.python.Object microseconds) {
-        double value = getDouble(microseconds, "microseconds");
-        totalNanoseconds += value * 1000;
+
+    private void addSeconds(double seconds) {
+        long fullSeconds = (long) seconds;
+        duration = duration.plusSeconds(fullSeconds);
+        double microseconds = (seconds - fullSeconds) * 1e6;
+        addMicroseconds(microseconds);
     }
-    private void addMilliseconds(org.python.Object milliseconds) {
-        double value = getDouble(milliseconds, "milliseconds");
-        totalNanoseconds += value * 1e6;
+
+    private void addMicroseconds(double microseconds) {
+        double nanoseconds = microseconds * 1000.0;
+        duration = duration.plusNanos(Math.round(nanoseconds));
     }
-    private void addMinutes(org.python.Object minutes) {
-        double value = getDouble(minutes, "minutes");
-        totalNanoseconds += value * 60 * 1e9;
+
+    private void addMilliseconds(double milliseconds) {
+        addMicroseconds(milliseconds * 1000);
     }
-    private void addHours(org.python.Object hours) {
-        double value = getDouble(hours, "hours");
-        totalNanoseconds += value * 60 * 60 * 1e9;
+
+    private void addMinutes(double minutes) {
+        addSeconds(minutes * 60);
     }
-    private void addWeeks(org.python.Object weeks) {
-        double value = getDouble(weeks, "weeks");
-        totalNanoseconds += value * 7 * 24 * 60 * 60 * 1e9;
+
+    private void addHours(double hours) {
+        addMinutes(hours * 60);
+    }
+
+    private void addWeeks(double weeks) {
+        addDays(weeks * 7);
     }
 
     @org.python.Method(__doc__ = "returns days")
-    public org.python.types.Str __days__() {
-        return new org.python.types.Str(this.days + "");
+    public org.python.Object __days__() {
+        return this.days;
     }
 
     @org.python.Method(__doc__ = "returns seconds")
-    public org.python.types.Str __seconds__() {
-        return new org.python.types.Str(this.seconds + "");
+    public org.python.Object __seconds__() {
+        return this.seconds;
     }
 
     @org.python.Method(__doc__ = "returns microseconds")
-    public org.python.types.Str __microseconds__() {
-        return new org.python.types.Str(this.microseconds + "");
+    public org.python.Object __microseconds__() {
+        return this.microseconds;
     }
 
     @org.python.Method(__doc__ = "returns the most negative TimeDelta object")
     public static TimeDelta __min__() {
-        org.python.Object[] args = {};
-        java.util.HashMap<java.lang.String, org.python.Object> kwargs = new HashMap<>();
-
-        kwargs.put("days", org.python.types.Int.getInt(-999999999));
-
-        TimeDelta TD = new TimeDelta(args, kwargs);
-	    return TD;
+        return minDelta;
     }
 
     @org.python.Method(__doc__ = "returns the most positive TimeDelta object")
     public static TimeDelta __max__() {
-        org.python.Object[] args = {};
-        java.util.HashMap<java.lang.String, org.python.Object> kwargs = new HashMap<>();
-
-        kwargs.put("days", org.python.types.Int.getInt(999999999));
-        kwargs.put("hours", org.python.types.Int.getInt(23));
-        kwargs.put("minutes", org.python.types.Int.getInt(59));
-        kwargs.put("seconds", org.python.types.Int.getInt(59));
-        kwargs.put("microseconds", org.python.types.Int.getInt(999999));
-
-        TimeDelta TD = new TimeDelta(args, kwargs);
-        return TD;
+        return maxDelta;
     }
 
     @org.python.Method(__doc__ = "returns smallest possible difference between non-equal TimeDelta objects")
     public static TimeDelta __resolution__() {
         org.python.Object[] args = {};
-        java.util.HashMap<java.lang.String, org.python.Object> kwargs = new HashMap<>();
+        java.util.Map<java.lang.String, org.python.Object> kwargs = new java.util.HashMap<>();
 
         kwargs.put("microseconds", org.python.types.Int.getInt(1));
 
-        TimeDelta TD = new TimeDelta(args, kwargs);
-        return TD;
+        return new TimeDelta(args, kwargs);
     }
 
-    @org.python.Method(__doc__ = "returns total seconds of timedelta")
-    public org.python.types.Str total_seconds() {
-        long days = (((org.python.types.Int) this.days).value) * 24 * 3600;
-        long sum_seconds = days + (((org.python.types.Int) this.seconds).value);
-        long microseconds = (((org.python.types.Int) this.microseconds).value);
-        String micro = "";
-        if (microseconds == 0) {
-            micro = "0";
-        } else if (microseconds < 10) {
-            micro = "00000" + microseconds;
-        } else if (microseconds < 100) {
-            micro = "0000" + microseconds;
-        } else if (microseconds < 1000) {
-            micro = "000" + microseconds;
-        } else if (microseconds < 10000) {
-            micro = "00" + microseconds;
-        } else if (microseconds < 100000) {
-            micro = "0" + microseconds;
-        } else {
-            micro = "" + microseconds;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
         }
-        String returnStr = ("" + sum_seconds + "." + micro);
-        return new org.python.types.Str(returnStr);
+        if (!(o instanceof TimeDelta)) {
+            return false;
+        }
+        TimeDelta other = (TimeDelta) o;
+        return Objects.equals(days, other.days) &&
+            Objects.equals(seconds, other.seconds) &&
+            Objects.equals(microseconds, other.microseconds);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(days, seconds, microseconds);
+    }
+
+    @org.python.Method(
+            __doc__ = "Return self == value.",
+            args = {"other"}
+    )
+    public org.python.Object __eq__(org.python.Object other) {
+        return org.python.types.Bool.getBool(equals(other));
+    }
+
+    @org.python.Method(
+            __doc__ = "Return self >= value.",
+            args = {"other"}
+    )
+    public org.python.Object __ge__(org.python.Object other) {
+        if (!(other instanceof TimeDelta)) {
+            throw new org.python.exceptions.TypeError(
+                "'>=' not supported between instances of 'datetime.timedelta' and '" + other.typeName() + "'"
+            );
+        }
+        if (equals(other)) {
+            return org.python.types.Bool.getBool(true);
+        }
+        return __gt__(other);
+    }
+
+    @org.python.Method(
+            __doc__ = "Return self > value.",
+            args = {"other"}
+    )
+    public org.python.Object __gt__(org.python.Object other) {
+        if (!(other instanceof TimeDelta)) {
+            throw new org.python.exceptions.TypeError(
+                "'>' not supported between instances of 'datetime.timedelta' and '" + other.typeName() + "'"
+            );
+        }
+        TimeDelta o = (TimeDelta) other;
+        return total_seconds().__gt__(o.total_seconds());
+    }
+
+    @org.python.Method(
+            __doc__ = "Return self <= value.",
+            args = {"other"}
+    )
+    public org.python.Object __le__(org.python.Object other) {
+        if (!(other instanceof TimeDelta)) {
+            throw new org.python.exceptions.TypeError(
+                "'<=' not supported between instances of 'datetime.timedelta' and '" + other.typeName() + "'"
+            );
+        }
+        if (equals(other)) {
+            return org.python.types.Bool.getBool(true);
+        }
+        return __lt__(other);
+    }
+
+    @org.python.Method(
+            __doc__ = "Return self < value.",
+            args = {"other"}
+    )
+    public org.python.Object __lt__(org.python.Object other) {
+        if (!(other instanceof TimeDelta)) {
+            throw new org.python.exceptions.TypeError(
+                "'<' not supported between instances of 'datetime.timedelta' and '" + other.typeName() + "'"
+            );
+        }
+        TimeDelta o = (TimeDelta) other;
+        return total_seconds().__lt__(o.total_seconds());
+    }
+
+    @org.python.Method()
+    public org.python.types.Float total_seconds() {
+        long total = (((org.python.types.Int) this.days).value) * 24 * 3600 * 1000000;
+        total += (((org.python.types.Int) this.seconds).value * 1000000);
+        total += (((org.python.types.Int) this.microseconds).value);
+        return new org.python.types.Float(total / 1000.0);
     }
 
     @org.python.Method(__doc__ = "Adds another TimeDelta and returns the resulting TimeDelta", args = {"other"})
@@ -261,10 +375,9 @@ public class TimeDelta extends org.python.types.Object {
         long sumSeconds = thisSeconds + otherSeconds;
         long sumMicroseconds = thisMicroseconds + otherMicroSeconds;
         org.python.Object[] args = {org.python.types.Int.getInt(sumDays),
-                                    org.python.types.Int.getInt(sumSeconds),
-                                    org.python.types.Int.getInt(sumMicroseconds)};
-        TimeDelta TD = new TimeDelta(args, Collections.EMPTY_MAP);
-        return TD;
+            org.python.types.Int.getInt(sumSeconds),
+            org.python.types.Int.getInt(sumMicroseconds)};
+        return new TimeDelta(args, EMPTY_KWARGS);
     }
 
     @org.python.Method(__doc__ = "Returns a copy of TimeDelta")
@@ -273,10 +386,9 @@ public class TimeDelta extends org.python.types.Object {
         long otherMicroSeconds = ((org.python.types.Int) this.microseconds).value;
         long otherDays = ((org.python.types.Int) this.days).value;
         org.python.Object[] args = {org.python.types.Int.getInt(otherDays),
-                                    org.python.types.Int.getInt(otherSeconds),
-                                    org.python.types.Int.getInt(otherMicroSeconds)};
-        TimeDelta TD = new TimeDelta(args, Collections.EMPTY_MAP);
-        return TD;
+            org.python.types.Int.getInt(otherSeconds),
+            org.python.types.Int.getInt(otherMicroSeconds)};
+        return new TimeDelta(args, EMPTY_KWARGS);
     }
 
     public org.python.types.Str __str__() {
@@ -285,16 +397,13 @@ public class TimeDelta extends org.python.types.Object {
         long microseconds = ((org.python.types.Int) this.microseconds).value;
 
         Duration duration = Duration.ofDays(days)
-            .plus(
-                Duration.ofSeconds(seconds)
-                    .plus(Duration.ofNanos(microseconds * 1000))
-            );
+                .plus(Duration.ofSeconds(seconds).plus(Duration.ofNanos(microseconds * 1000)));
 
         StringBuilder sb = new StringBuilder();
-        if (days > 0) {
+        if (Math.abs(days) > 0) {
             sb.append(days);
             sb.append(" day");
-            if (days > 1) {
+            if (Math.abs(days) > 1) {
                 sb.append("s");
             }
             sb.append(", ");
@@ -321,24 +430,24 @@ public class TimeDelta extends org.python.types.Object {
             throw new org.python.exceptions.TypeError("Argument needs to be an int, got " + multiple.typeName());
         }
 
-        long days = ((org.python.types.Int)this.days).value;
-        long seconds = ((org.python.types.Int)this.seconds).value;
-        long microseconds = ((org.python.types.Int)this.microseconds).value;
+        long days = ((org.python.types.Int) this.days).value;
+        long seconds = ((org.python.types.Int) this.seconds).value;
+        long microseconds = ((org.python.types.Int) this.microseconds).value;
 
-        if(mul == 0) {
+        if (mul == 0) {
             throw new org.python.exceptions.ValueError("Argument can't be zero");
         }
 
         long mulDays = days * mul;
         long mulSeconds = seconds * mul;
         long mulMicroseconds = microseconds * mul;
-        org.python.Object[] args = {org.python.types.Int.getInt(mulDays),
-                                    org.python.types.Int.getInt(mulSeconds),
-                                    org.python.types.Int.getInt(mulMicroseconds)};
+        org.python.Object[] args = {
+            org.python.types.Int.getInt(mulDays),
+            org.python.types.Int.getInt(mulSeconds),
+            org.python.types.Int.getInt(mulMicroseconds)
+        };
 
-        TimeDelta returnDelta = new TimeDelta(args, Collections.EMPTY_MAP);
-
-        return returnDelta;
+        return new TimeDelta(args, EMPTY_KWARGS);
     }
 
     @org.python.Method(__doc__ = "Delta absolute values")
@@ -347,25 +456,23 @@ public class TimeDelta extends org.python.types.Object {
         long absSeconds;
         long absMicroseconds;
 
-        long days = ((org.python.types.Int)this.days).value;
-        long seconds = ((org.python.types.Int)this.seconds).value;
-        long microseconds = ((org.python.types.Int)this.microseconds).value;
-        if(days >= 0){
+        long days = ((org.python.types.Int) this.days).value;
+        long seconds = ((org.python.types.Int) this.seconds).value;
+        long microseconds = ((org.python.types.Int) this.microseconds).value;
+        if (days >= 0) {
             absDays = days;
             absSeconds = seconds;
             absMicroseconds = microseconds;
         } else {
-            absDays = -1*days;
-            absSeconds = -1*seconds;
-            absMicroseconds = -1*microseconds;
+            absDays = -1 * days;
+            absSeconds = -1 * seconds;
+            absMicroseconds = -1 * microseconds;
         }
 
         org.python.Object[] args = {org.python.types.Int.getInt(absDays),
-                                    org.python.types.Int.getInt(absSeconds),
-                                    org.python.types.Int.getInt(absMicroseconds)};
+            org.python.types.Int.getInt(absSeconds),
+            org.python.types.Int.getInt(absMicroseconds)};
 
-        TimeDelta returnDelta = new TimeDelta(args, Collections.EMPTY_MAP);
-
-        return returnDelta;
+        return new TimeDelta(args, EMPTY_KWARGS);
     }
 }
