@@ -38,6 +38,9 @@
     <ant antfile="build-java.xml" target="dist"/>
     <ant antfile="build-java.xml" target="dist-testdaemon"/>
   </target>
+  <target name="java-test">
+    <ant antfile="build-java.xml" target="test"/>
+  </target>
 
   <target name="android">
     <ant antfile="build-android.xml" target="dist"/>
