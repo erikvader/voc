@@ -19,6 +19,9 @@ tests/tmp*
 /stdlib_tests/python
 /python/*.class
 /lib
+/TEST-*.txt
+/coverage_report
+/jacoco.exec
 
 .DS_Store
 .idea/

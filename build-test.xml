@@ -1,4 +1,4 @@
-<project name="python" default="run" basedir=".">
+<project name="python" default="run" basedir="." xmlns:jacoco="antlib:org.jacoco.ant">
   <target name="build">
     <mkdir dir="${build}/jtests" />
     <javac debug="true"
@@ -10,19 +10,44 @@
     </javac>
   </target>
 
-  <target name="run" depends="build">
-    <junit printsummary="yes">
-      <classpath>
-        <pathelement location="lib/junit.jar" />
-        <pathelement location="lib/hamcrest-core.jar" />
-        <pathelement location="${build}/jtests" />
-        <pathelement location="${build}/java" />
-      </classpath>
+  <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+    <classpath path="lib/jacocoant.jar"/>
+  </taskdef>
 
-      <formatter type="plain" />
+  <target name="test" depends="build">
+    <jacoco:coverage>
+      <junit printsummary="yes" fork="yes" forkmode="once">
+        <classpath>
+          <pathelement location="lib/junit.jar" />
+          <pathelement location="lib/hamcrest-core.jar" />
+          <pathelement location="${build}/jtests" />
+          <pathelement location="${build}/java" />
+        </classpath>
 
-      <test name="DateTimeTest" />
-    </junit>
+        <formatter type="plain" />
+
+        <test name="DateTimeTest" />
+      </junit>
+    </jacoco:coverage>
+
+    <jacoco:report>
+      <executiondata>
+        <file file="jacoco.exec" />
+      </executiondata>
+
+      <structure name="voc">
+        <classfiles>
+          <fileset dir="${build}/java" />
+          <fileset dir="${build}/jtests" />
+        </classfiles>
+
+        <sourcefiles>
+          <fileset dir="${src}/common" />
+        </sourcefiles>
+      </structure>
+
+      <html destdir="coverage_report" />
+    </jacoco:report>
   </target>
 
   <target name="clean">

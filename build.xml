@@ -40,7 +40,7 @@
   </target>
 
   <target name="test" depends="java">
-    <ant antfile="build-test.xml" target="run" />
+    <ant antfile="build-test.xml" target="test" />
   </target>
 
   <target name="android">
