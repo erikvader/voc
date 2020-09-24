@@ -1,0 +1,33 @@
+<project name="python" default="run" basedir=".">
+  <target name="build">
+    <mkdir dir="${build}/jtests" />
+    <javac debug="true"
+           includeantruntime="false"
+           destdir="${build}/jtests">
+      <src path="jtests" />
+      <classpath path="${build}/java" />
+      <classpath path="lib/junit.jar" />
+    </javac>
+  </target>
+
+  <target name="run" depends="build">
+    <junit printsummary="yes">
+      <classpath>
+        <pathelement location="lib/junit.jar" />
+        <pathelement location="lib/hamcrest-core.jar" />
+        <pathelement location="${build}/jtests" />
+        <pathelement location="${build}/java" />
+      </classpath>
+
+      <formatter type="plain" />
+
+      <test name="DateTimeTest" />
+    </junit>
+  </target>
+
+  <target name="clean">
+    <delete>
+      <fileset dir="." includes="TEST-*.txt" />
+    </delete>
+  </target>
+</project>
