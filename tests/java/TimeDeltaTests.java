@@ -1,5 +1,6 @@
 import org.python.Object;
 import org.python.exceptions.TypeError;
+import org.python.exceptions.ValueError;
 import org.python.stdlib.datetime.TimeDelta;
 
 import org.junit.Test;
@@ -194,5 +195,101 @@ public class TimeDeltaTests {
 
         error = assertThrows(TypeError.class, () -> new TimeDelta(args.toArray(new Int[] {}), kwargs));
         assertEquals("__new__() takes at most 7 arguments (" + (args.size() + kwargs.size()) + " given)", error.getMessage());
+    }
+
+    @Test
+    public void Test_multiplyTimeDeltaWithInt_Expect_ValidTimeDelta(){
+        Object[] args = {
+            Int.getInt(2),
+            Int.getInt(2),
+            Int.getInt(2)
+        };
+
+        Map<String, Object> kwargs = new HashMap<>();
+
+        TimeDelta TD = new TimeDelta(args, kwargs);
+        TimeDelta TDres = TD.__mul__(Int.getInt(2));
+
+        assertDelta(4, 4, 4, TDres);
+    }
+
+    @Test(expected = ValueError.class)
+    public void Test_MultiplyTimeDeltaWithZero_ExpectError() {
+        Object[] args = {
+            Int.getInt(2),
+            Int.getInt(2),
+            Int.getInt(2)
+        };
+
+        Map<String, Object> kwargs = new HashMap<>();
+
+        TimeDelta TD = new TimeDelta(args, kwargs);
+        TimeDelta TDres = TD.__mul__(Int.getInt(0));
+    }
+
+    @Test(expected = TypeError.class)
+    public void Test_MultiplyTimeDeltaWithString_ExpectError(){
+        Object[] args = {
+            Int.getInt(2),
+            Int.getInt(2),
+            Int.getInt(2)
+        };
+
+        Map<String, Object> kwargs = new HashMap<>();
+
+        TimeDelta TD = new TimeDelta(args, kwargs);
+        TimeDelta TDres = TD.__mul__(new Str("test"));
+    }
+
+    @Test
+    public void Test_AddTD_Expect_ValidTimeDelta(){
+        Object[] args = {
+            Int.getInt(2),
+            Int.getInt(2),
+            Int.getInt(2)
+        };
+
+        Map<String, Object> kwargs = new HashMap<>();
+
+        TimeDelta TD = new TimeDelta(args, kwargs);
+        TimeDelta TD2 = new TimeDelta(args, kwargs);
+
+        TimeDelta TDRes = TD.__add__(TD2);
+
+        assertDelta(4,4,4, TDRes);
+    }
+
+    @Test
+    public void Test_AbsTDPositiveDays_Expect_ValidTimeDelta(){
+        Object[] args = {
+            Int.getInt(2),
+            Int.getInt(2),
+            Int.getInt(2)
+        };
+
+        Map<String, Object> kwargs = new HashMap<>();
+
+        TimeDelta TD = new TimeDelta(args, kwargs);
+
+        TimeDelta TDabs = TD.__abs__();
+
+        assertDelta(2,2,2, TDabs);
+    }
+
+    @Test
+    public void Test_AbsTDNegativeDays_Expect_ValidTimeDelta(){
+        Object[] args = {
+            Int.getInt(-2),
+            Int.getInt(-2),
+            Int.getInt(-2)
+        };
+
+        Map<String, Object> kwargs = new HashMap<>();
+
+        TimeDelta TD = new TimeDelta(args, kwargs);
+
+        TimeDelta TDabs = TD.__abs__();
+
+        assertDelta(2,2,2, TDabs);    
     }
 }

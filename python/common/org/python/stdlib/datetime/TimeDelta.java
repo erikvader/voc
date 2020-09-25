@@ -187,7 +187,6 @@ public class TimeDelta extends org.python.types.Object {
 
     @org.python.Method()
     public org.python.Object __min__() {
-
         return new org.python.types.Str("-999999 days, 0:00:00");
     }
 
@@ -227,7 +226,7 @@ public class TimeDelta extends org.python.types.Object {
     }
 
     @org.python.Method(__doc__ = "", args = {"other"})
-    public org.python.Object __add__(org.python.Object other) {
+    public TimeDelta __add__(org.python.Object other) {
         long thisDays = ((org.python.types.Int) this.days).value;
         TimeDelta otherObject = (org.python.stdlib.datetime.TimeDelta) other;
         long otherDays = ((org.python.types.Int) otherObject.days).value;
@@ -283,5 +282,62 @@ public class TimeDelta extends org.python.types.Object {
             sb.append(String.format(".%06d", microseconds));
         }
         return new org.python.types.Str(sb.toString());
+    }
+
+    @org.python.Method(__doc__ = "Delta multiplied by an integer, integer can't be zero", args = {"multiple"})
+    public TimeDelta __mul__(org.python.Object multiple) {
+        long mul;
+        try {
+            mul = ((org.python.types.Int) multiple).value;
+        } catch (ClassCastException e) {
+            throw new org.python.exceptions.TypeError("Argument needs to be an int, got " + multiple.typeName());
+        }
+
+        long days = ((org.python.types.Int)this.days).value;
+        long seconds = ((org.python.types.Int)this.seconds).value;
+        long microseconds = ((org.python.types.Int)this.microseconds).value;
+
+        if(mul == 0) {
+            throw new org.python.exceptions.ValueError("Argument can't be zero");
+        }
+
+        long mulDays = days * mul;
+        long mulSeconds = seconds * mul;
+        long mulMicroseconds = microseconds * mul;
+        org.python.Object[] args = {org.python.types.Int.getInt(mulDays),
+                                    org.python.types.Int.getInt(mulSeconds),
+                                    org.python.types.Int.getInt(mulMicroseconds)};
+
+        TimeDelta returnDelta = new TimeDelta(args, Collections.EMPTY_MAP);
+
+        return returnDelta;
+    }
+
+    @org.python.Method(__doc__ = "Delta absolute values", args = {"timedelta"})
+    public TimeDelta __abs__() {
+        long absDays;
+        long absSeconds;
+        long absMicroseconds;
+
+        long days = ((org.python.types.Int)this.days).value;
+        long seconds = ((org.python.types.Int)this.seconds).value;
+        long microseconds = ((org.python.types.Int)this.microseconds).value;
+        if(days >= 0){
+            absDays = days;
+            absSeconds = seconds;
+            absMicroseconds = microseconds;
+        } else {
+            absDays = -1*days;
+            absSeconds = -1*seconds;
+            absMicroseconds = -1*microseconds;
+        }
+
+        org.python.Object[] args = {org.python.types.Int.getInt(absDays),
+                                    org.python.types.Int.getInt(absSeconds),
+                                    org.python.types.Int.getInt(absMicroseconds)};
+
+        TimeDelta returnDelta = new TimeDelta(args, Collections.EMPTY_MAP);
+
+        return returnDelta;
     }
 }
