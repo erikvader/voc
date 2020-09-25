@@ -175,29 +175,29 @@ public class TimeDelta extends org.python.types.Object {
         return new org.python.types.Str(this.days + "");
     }
 
-    @org.python.Method(__doc__ = "returns month")
+    @org.python.Method(__doc__ = "returns seconds")
     public org.python.types.Str __seconds__() {
         return new org.python.types.Str(this.seconds + "");
     }
 
-    @org.python.Method(__doc__ = "returns day")
+    @org.python.Method(__doc__ = "returns microseconds")
     public org.python.types.Str __microseconds__() {
         return new org.python.types.Str(this.microseconds + "");
     }
 
-    @org.python.Method()
+    @org.python.Method(__doc__ = "returns the most negative TimeDelta object")
     public org.python.Object __min__() {
-        return new org.python.types.Str("-999999 days, 0:00:00");
+	return new org.python.types.Str("-999999 days, 0:00:00");
     }
 
-    @org.python.Method()
+    @org.python.Method(__doc__ = "returns the most positive TimeDelta object")
     public org.python.Object __max__() {
-        return new org.python.types.Str("9999999 days, 23:59:59.999999");
+	return new org.python.types.Str("9999999 days, 23:59:59.999999");
     }
 
-    @org.python.Method()
+    @org.python.Method(__doc__ = "returns smallest possible difference between non-equal TimeDelta objects")
     public org.python.Object __resolution__() {
-        return new org.python.types.Str("0:00:00.000001");
+	return new org.python.types.Str("0:00:00.000001");
     }
 
     @org.python.Method()
@@ -237,16 +237,20 @@ public class TimeDelta extends org.python.types.Object {
         long sumDays = thisDays + otherDays;
         long sumSeconds = thisSeconds + otherSeconds;
         long sumMicroseconds = thisMicroseconds + otherMicroSeconds;
-        org.python.Object[] args = {org.python.types.Int.getInt(sumDays), org.python.types.Int.getInt(sumSeconds), org.python.types.Int.getInt(sumMicroseconds)};
+        org.python.Object[] args = {org.python.types.Int.getInt(sumDays),
+                                    org.python.types.Int.getInt(sumSeconds),
+                                    org.python.types.Int.getInt(sumMicroseconds)};
         TimeDelta TD = new TimeDelta(args, Collections.EMPTY_MAP);
         return TD;
     }
 
-    public org.python.Object __pos__() {
+    public TimeDelta __pos__() {
         long otherSeconds = ((org.python.types.Int) this.seconds).value;
         long otherMicroSeconds = ((org.python.types.Int) this.microseconds).value;
         long otherDays = ((org.python.types.Int) this.days).value;
-        org.python.Object[] args = {org.python.types.Int.getInt(otherDays), org.python.types.Int.getInt(otherSeconds), org.python.types.Int.getInt(otherMicroSeconds)};
+        org.python.Object[] args = {org.python.types.Int.getInt(otherDays),
+                                    org.python.types.Int.getInt(otherSeconds),
+                                    org.python.types.Int.getInt(otherMicroSeconds)};
         TimeDelta TD = new TimeDelta(args, Collections.EMPTY_MAP);
         return TD;
     }

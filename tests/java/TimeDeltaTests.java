@@ -242,7 +242,7 @@ public class TimeDeltaTests {
     }
 
     @Test
-    public void Test_AddTD_Expect_ValidTimeDelta(){
+    public void Test_AddTDWithPositiveValues_Expect_ValidTimeDelta(){
         Object[] args = {
             Int.getInt(2),
             Int.getInt(2),
@@ -257,6 +257,48 @@ public class TimeDeltaTests {
         TimeDelta TDRes = TD.__add__(TD2);
 
         assertDelta(4,4,4, TDRes);
+    }
+
+    @Test
+    public void Test_AddTDWithNegativeValues_Expect_ValidTimeDelta(){
+        Object[] args = {
+            Int.getInt(2),
+            Int.getInt(2),
+            Int.getInt(2)
+        };
+
+        Object[] negArgs = {
+            Int.getInt(-2),
+            Int.getInt(-2),
+            Int.getInt(-2)
+        };
+
+
+        Map<String, Object> kwargs = new HashMap<>();
+
+        TimeDelta TD = new TimeDelta(args, kwargs);
+        TimeDelta TD2 = new TimeDelta(negArgs, kwargs);
+
+        TimeDelta TDRes = TD.__add__(TD2);
+
+        assertDelta(0,0,0, TDRes);
+    }
+
+    @Test
+    public void Test_PosTD_Expect_ValidTimeDelta(){
+        Object[] args = {
+            Int.getInt(2),
+            Int.getInt(2),
+            Int.getInt(2)
+        };
+
+        Map<String, Object> kwargs = new HashMap<>();
+
+        TimeDelta TD = new TimeDelta(args, kwargs);
+
+        TimeDelta TDPos = TD.__pos__();
+
+        assertDelta(2,2,2, TDPos);
     }
 
     @Test
@@ -290,6 +332,6 @@ public class TimeDeltaTests {
 
         TimeDelta TDabs = TD.__abs__();
 
-        assertDelta(2,2,2, TDabs);    
+        assertDelta(2,2,2, TDabs);
     }
 }
