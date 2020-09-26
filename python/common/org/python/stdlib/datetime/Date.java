@@ -54,10 +54,10 @@ public class Date extends org.python.types.Object {
 	    }
 
 	    if ((this.year instanceof org.python.types.Int) && (this.month instanceof org.python.types.Int) && (this.day instanceof org.python.types.Int)) {
-		if (1 <= ((org.python.types.Int) this.year).value && ((org.python.types.Int) this.year).value <= 999) {
+		if (1 <= ((org.python.types.Int) this.year).value && ((org.python.types.Int) this.year).value <= 9999) {
 
-		    if (1d <= ((org.python.types.Int) this.month).value && ((org.python.types.Int) this.month).value <= 12d) {
-			if (1d <= ((org.python.types.Int) this.day).value && ((org.python.types.Int) this.day).value <= 31d) {
+		    if (1 <= ((org.python.types.Int) this.month).value && ((org.python.types.Int) this.month).value <= 12) {
+			if (1 <= ((org.python.types.Int) this.day).value && ((org.python.types.Int) this.day).value <= 31) {
 			} else {
 			    throw new org.python.exceptions.ValueError("day is out of range for month");
 			}
@@ -234,7 +234,15 @@ public class Date extends org.python.types.Object {
 
 	org.python.Object[] args = { org.python.types.Int.getInt(y), org.python.types.Int.getInt(m), org.python.types.Int.getInt(d) };
 	return new Date(args, Collections.emptyMap());
-    }
+	}
+	
+	@org.python.Method(__doc__ = "")
+	public static org.python.types.Int compare(Date d1, Date d2) {
+		if ( ((org.python.types.Int) d1.year).value > ((org.python.types.Int) d2.year).value ) {
+			return org.python.types.Int.getInt(1);
+		}
+		return org.python.types.Int.getInt(1);
+	}
 
     @org.python.Method(__doc__ = "")
     public org.python.Object ctime() {
