@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.HashMap;
 
 public class TimeDelta extends org.python.types.Object {
 
@@ -20,11 +21,11 @@ public class TimeDelta extends org.python.types.Object {
     public org.python.Object microseconds = __microseconds__();
 
     @org.python.Attribute
-    public org.python.Object min = __min__();
+    public static org.python.Object min = __min__();
     @org.python.Attribute
-    public org.python.Object max = __max__();
+    public static org.python.Object max = __max__();
     @org.python.Attribute
-    public org.python.Object resolution = __resolution__();
+    public static org.python.Object resolution = __resolution__();
 
     public long totalNanoseconds = 0;
 
@@ -186,21 +187,43 @@ public class TimeDelta extends org.python.types.Object {
     }
 
     @org.python.Method(__doc__ = "returns the most negative TimeDelta object")
-    public org.python.Object __min__() {
-	return new org.python.types.Str("-999999 days, 0:00:00");
+    public static TimeDelta __min__() {
+        org.python.Object[] args = {};
+        java.util.HashMap<java.lang.String, org.python.Object> kwargs = new HashMap<>();
+
+        kwargs.put("days", org.python.types.Int.getInt(-999999999));
+
+        TimeDelta TD = new TimeDelta(args, kwargs);
+	    return TD;
     }
 
     @org.python.Method(__doc__ = "returns the most positive TimeDelta object")
-    public org.python.Object __max__() {
-	return new org.python.types.Str("9999999 days, 23:59:59.999999");
+    public static TimeDelta __max__() {
+        org.python.Object[] args = {};
+        java.util.HashMap<java.lang.String, org.python.Object> kwargs = new HashMap<>();
+
+        kwargs.put("days", org.python.types.Int.getInt(999999999));
+        kwargs.put("hours", org.python.types.Int.getInt(23));
+        kwargs.put("minutes", org.python.types.Int.getInt(59));
+        kwargs.put("seconds", org.python.types.Int.getInt(59));
+        kwargs.put("microseconds", org.python.types.Int.getInt(999999));
+
+        TimeDelta TD = new TimeDelta(args, kwargs);
+        return TD;
     }
 
     @org.python.Method(__doc__ = "returns smallest possible difference between non-equal TimeDelta objects")
-    public org.python.Object __resolution__() {
-	return new org.python.types.Str("0:00:00.000001");
+    public static TimeDelta __resolution__() {
+        org.python.Object[] args = {};
+        java.util.HashMap<java.lang.String, org.python.Object> kwargs = new HashMap<>();
+
+        kwargs.put("microseconds", org.python.types.Int.getInt(1));
+
+        TimeDelta TD = new TimeDelta(args, kwargs);
+        return TD;
     }
 
-    @org.python.Method()
+    @org.python.Method(__doc__ = "returns total seconds of timedelta")
     public org.python.types.Str total_seconds() {
         long days = (((org.python.types.Int) this.days).value) * 24 * 3600;
         long sum_seconds = days + (((org.python.types.Int) this.seconds).value);
@@ -225,7 +248,7 @@ public class TimeDelta extends org.python.types.Object {
         return new org.python.types.Str(returnStr);
     }
 
-    @org.python.Method(__doc__ = "", args = {"other"})
+    @org.python.Method(__doc__ = "Adds another TimeDelta and returns the resulting TimeDelta", args = {"other"})
     public TimeDelta __add__(org.python.Object other) {
         long thisDays = ((org.python.types.Int) this.days).value;
         TimeDelta otherObject = (org.python.stdlib.datetime.TimeDelta) other;
@@ -244,6 +267,7 @@ public class TimeDelta extends org.python.types.Object {
         return TD;
     }
 
+    @org.python.Method(__doc__ = "Returns a copy of TimeDelta")
     public TimeDelta __pos__() {
         long otherSeconds = ((org.python.types.Int) this.seconds).value;
         long otherMicroSeconds = ((org.python.types.Int) this.microseconds).value;
@@ -317,7 +341,7 @@ public class TimeDelta extends org.python.types.Object {
         return returnDelta;
     }
 
-    @org.python.Method(__doc__ = "Delta absolute values", args = {"timedelta"})
+    @org.python.Method(__doc__ = "Delta absolute values")
     public TimeDelta __abs__() {
         long absDays;
         long absSeconds;

@@ -334,4 +334,37 @@ public class TimeDeltaTests {
 
         assertDelta(2,2,2, TDabs);
     }
+
+    @Test
+    public void Test_minTD_Expect_ValidTimeDelta(){
+        Object[] args = {};
+
+        Map<String, Object> kwargs = new HashMap<>();
+
+        TimeDelta TD = new TimeDelta(args, kwargs);
+
+        assertDelta(-999999999, 0, 0, TD.__min__());
+    }
+
+    @Test
+    public void Test_maxTD_Expect_ValidTimeDelta(){
+        Object[] args = {};
+
+        Map<String, Object> kwargs = new HashMap<>();
+
+        TimeDelta TD = new TimeDelta(args, kwargs);
+
+        assertDelta(999999999, 59, 999999, TD.__max__());
+    }
+
+    @Test
+    public void Test_resolutionTD_Expect_ValidTimeDelta(){
+        Object[] args = {};
+
+        Map<String, Object> kwargs = new HashMap<>();
+
+        TimeDelta TD = new TimeDelta(args, kwargs);
+
+        assertDelta(0, 0, 1, TD.__resolution__());
+    }
 }
