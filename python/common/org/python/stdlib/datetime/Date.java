@@ -292,8 +292,13 @@ public class Date extends org.python.types.Object {
 	java.util.Calendar c = java.util.Calendar.getInstance();
 	c.setTime(myCalendar);
 	int day = c.get(java.util.Calendar.DAY_OF_WEEK);
-	int[] convertToPython = { 0, 1, 2, 3, 4, 5, 6 };
+	int[] convertToPython = { 6, 0, 1, 2, 3, 4, 5};
 	return org.python.types.Int.getInt(convertToPython[day - 1]);
 
-    }
+	}
+	
+	public org.python.Object isoweekday() {
+		org.python.types.Int dayOfWeek = (org.python.types.Int) weekday();
+		return org.python.types.Int.getInt(dayOfWeek.value + 1);
+	}
 }
