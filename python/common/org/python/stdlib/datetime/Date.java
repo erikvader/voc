@@ -235,13 +235,37 @@ public class Date extends org.python.types.Object {
 	org.python.Object[] args = { org.python.types.Int.getInt(y), org.python.types.Int.getInt(m), org.python.types.Int.getInt(d) };
 	return new Date(args, Collections.emptyMap());
 	}
-	
+
 	@org.python.Method(__doc__ = "")
-	public static org.python.types.Int compare(Date d1, Date d2) {
-		if ( ((org.python.types.Int) d1.year).value > ((org.python.types.Int) d2.year).value ) {
-			return org.python.types.Int.getInt(1);
-		}
-		return org.python.types.Int.getInt(1);
+	public static Date fromisoformat(org.python.types.Str string) {
+		String[] str = string.value.split("-");
+		int year = Integer.parseInt(str[0]);
+		int month = Integer.parseInt(str[1]);
+		int day = Integer.parseInt(str[2]);
+		org.python.Object[] args = { org.python.types.Int.getInt(year), org.python.types.Int.getInt(month), org.python.types.Int.getInt(day) };
+		return new Date(args, Collections.emptyMap());
+	}
+
+	@org.python.Method(__doc__ = "")
+	public org.python.types.Bool before(Date d) {
+		java.util.Calendar d1 = java.util.Calendar.getInstance();
+		d1.set( (int)((org.python.types.Int) this.year).value, (int)((org.python.types.Int) this.month).value, (int)((org.python.types.Int) this.day).value);
+		java.util.Calendar d2 = java.util.Calendar.getInstance();
+		d2.set( (int)((org.python.types.Int) d.year).value, (int)((org.python.types.Int) d.month).value, (int)((org.python.types.Int) d.day).value);
+		
+		if (d1.before(d2)) return org.python.types.Bool.TRUE;
+		else return org.python.types.Bool.FALSE;
+	}
+
+	@org.python.Method(__doc__ = "")
+	public org.python.types.Bool after(Date d) {
+		java.util.Calendar d1 = java.util.Calendar.getInstance();
+		d1.set( (int)((org.python.types.Int) this.year).value, (int)((org.python.types.Int) this.month).value, (int)((org.python.types.Int) this.day).value);
+		java.util.Calendar d2 = java.util.Calendar.getInstance();
+		d2.set( (int)((org.python.types.Int) d.year).value, (int)((org.python.types.Int) d.month).value, (int)((org.python.types.Int) d.day).value);
+		
+		if (d1.after(d2)) return org.python.types.Bool.TRUE;
+		else return org.python.types.Bool.FALSE;
 	}
 
     @org.python.Method(__doc__ = "")
