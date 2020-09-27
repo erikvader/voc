@@ -1,9 +1,9 @@
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import org.junit.Test;
 import org.python.stdlib.datetime.Date;
 import org.python.exceptions.TypeError;
 import org.python.exceptions.ValueError;
-import org.python.types.Int;
+import org.python.types.*;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.HashMap;
@@ -13,17 +13,40 @@ import java.util.Collections;
 public class DateTest {
     @Test
     public void testCreateDate() {
-        org.python.Object[] args = { Int.getInt(2020), // year
+        org.python.Object[] args = { 
+                Int.getInt(2020), // year
                 Int.getInt(10), // month
                 Int.getInt(24), // day
         };
-        Map kwargs = new HashMap<java.lang.String, org.python.Object>();
-        Date d = new Date(args, kwargs);
+        Date d = new Date(args, Collections.EMPTY_MAP);
         assertEquals(d.year, args[0]);
         assertEquals(d.month, args[1]);
         assertEquals(d.day, args[2]);
     }
 
+    @Test
+    public void testWeekday() {
+        org.python.Object[] args = { 
+            Int.getInt(2020), // year
+            Int.getInt(10), // month
+            Int.getInt(24), // day, 24 october is an saturday
+        };
+        Date d = new Date(args, Collections.EMPTY_MAP);
+
+        assertEquals(d.weekday(), Int.getInt(5));
+    }
+
+    @Test
+    public void testISOWeekday() {
+        org.python.Object[] args = { 
+            Int.getInt(2020), // year
+            Int.getInt(10), // month
+            Int.getInt(24), // day, 24 october is an saturday
+        };
+        Date d = new Date(args, Collections.EMPTY_MAP);
+
+        assertEquals(d.isoweekday(), Int.getInt(6));
+    }
 
     @Test(expected = TypeError.class)
     public void testMissingDay() {
@@ -115,5 +138,38 @@ public class DateTest {
         assertEquals(today.year, Int.getInt(cal.get(Calendar.YEAR)));
         assertEquals(today.month, Int.getInt(cal.get(Calendar.MONTH) + 1)); //Cal month starts at 0
         assertEquals(today.day, Int.getInt(cal.get(Calendar.DAY_OF_MONTH)));
+    }
+
+    @Test 
+    public void testCompare() {
+        org.python.Object[] date1_args = { 
+            Int.getInt(2020), // year
+            Int.getInt(10), // month
+            Int.getInt(24), // day
+        };
+        Date d1 = new Date(date1_args, Collections.EMPTY_MAP);
+
+        org.python.Object[] date2_args = { 
+            Int.getInt(2021), // year
+            Int.getInt(10), // month
+            Int.getInt(24), // day
+        };
+        Date d2 = new Date(date2_args, Collections.EMPTY_MAP);
+        assertEquals(d1.before(d2), Bool.TRUE);
+        assertEquals(d1.after(d2), Bool.FALSE);
+
+        d2.year = Int.getInt(2020);
+        d1.month = Int.getInt(11);
+        assertEquals(d1.before(d2), Bool.FALSE);
+        assertEquals(d1.after(d2), Bool.TRUE);
+    }
+
+    @Test
+    public void testFromISO() {
+        Date d = Date.fromisoformat(new Str("2020-04-06"));
+        assertEquals(d.year, Int.getInt(2020));
+        assertEquals(d.month, Int.getInt(04));
+        assertEquals(d.day, Int.getInt(06));
+
     }
 }
