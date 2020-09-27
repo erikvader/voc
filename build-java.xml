@@ -1,22 +1,30 @@
-<project name="python" default="dist" basedir=".">
+<project name="python" default="dist" basedir="." xmlns:jacoco="antlib:org.jacoco.ant">
   <description>
     Build Python support libraries for voc
   </description>
 
   <target name="compile" description="Compile the Oracle-specific source">
     <mkdir dir="${build}/java"/>
-    <mkdir dir="${build}/test"/>
     <javac debug="true"
            debuglevel="lines,vars,source"
            includeantruntime="false"
-           classpath="lib/junit-4.13.jar"
            destdir="${build}/java">
       <src path="${src}/common"/>
       <src path="${src}/java"/>
-      <src path="${src}/../tests/java/junit"/>
     </javac>
   </target>
 
+  <target name="compile-tests" description="Compile test files">
+    <mkdir dir="${build}/test"/>
+    <javac debug="true"
+         debuglevel="lines,vars,source"
+         includeantruntime="false"
+         classpath="lib/junit-4.13.jar;${build}/java"
+         destdir="${build}/test">
+      <src path="${src}/../tests/java/junit"/>
+    </javac>
+  </target>
+  
   <target name="compile_stdlib" description="Compile the standard library">
     <exec executable="python">
       <arg value="tools/compile_stdlib.py"/>
@@ -65,19 +73,42 @@
     <delete dir="${dist}"/>
   </target>
 
-  <junit printsummary="yes" haltonfailure="no" showoutput="yes">
-    <classpath>
-      <pathelement location="lib/hamcrest-core-1.3.jar"/>
-      <pathelement location="lib/junit-4.13.jar"/>
-      <pathelement location="${build}/java"/>
-    </classpath>
+  <target name="tests" depends="compile, compile-tests">
+    <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+      <classpath path="lib/jacocoant.jar"/>
+    </taskdef>
+    <jacoco:coverage>
+      <junit printsummary="yes" fork="true">
+        <formatter type="plain" usefile="false"/>
+        <classpath>
+          <pathelement location="lib/jacocoant.jar"/>
+          <pathelement location="lib/junit-4.13.jar"/>
+          <pathelement location="lib/hamcrest-core-1.3.jar"/>
+          <pathelement location="${build}/java"/>
+          <pathelement location="${build}/test"/>
+        </classpath>
+        <batchtest>
+          <fileset dir="${build}/test">
+            <include name="**/*.class"/>
+          </fileset>
+        </batchtest>
+      </junit>
+    </jacoco:coverage>
 
-    <formatter type="plain"/>
-
-    <batchtest fork="yes" todir="build/java">
-      <fileset dir="tests/java">
-        <include name="**/*Test.java"/>
-      </fileset>
-    </batchtest>
-  </junit>
+    <jacoco:report>
+      <executiondata>
+        <file file="jacoco.exec"/>
+      </executiondata>
+      <structure name="jacoco-sample">
+        <classfiles>
+          <fileset dir="${build}/java"/>
+        </classfiles>
+        <sourcefiles encoding="UTF-8">
+          <fileset dir="${src}/java"/>
+          <fileset dir="${src}/common"/>
+        </sourcefiles>
+      </structure>
+      <html destdir="build/coverage-report"/>
+   </jacoco:report>
+  </target>
 </project>
