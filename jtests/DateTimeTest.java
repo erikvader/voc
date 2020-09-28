@@ -217,4 +217,29 @@ public class DateTimeTest {
         DateTime dt = new DateTime(args, kwargs);
         assertEquals(dt.weekday(),Int.getInt(0));
     }
+    
+    
+    @Test
+    public void testReturns() {
+        Map<String, org.python.Object> kwargs = new HashMap<String, org.python.Object>();
+        org.python.Object[] args = {
+            Int.getInt(2020),
+            Int.getInt(9),
+            Int.getInt(28),
+            Int.getInt(1),
+            Int.getInt(2),
+            Int.getInt(3),
+            Int.getInt(4),
+        };
+        DateTime dt = new DateTime(args, kwargs);
+
+        assertEquals(dt.year, dt.__year__());
+        assertEquals(dt.month, dt.__month__());
+        assertEquals(dt.day, dt.__day__());
+        assertEquals(dt.hour, dt.__hour__());
+        assertEquals(dt.minute, dt.__minute__());
+        assertEquals(dt.second, dt.__second__());
+        assertEquals(dt.microsecond, dt.__microsecond__());
+    }
+    
 }
