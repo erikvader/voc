@@ -102,12 +102,14 @@ public class TimeDeltaTests {
         Object[] args = { Int.getInt(-1) };
         Map<String, Object> kwargs = new HashMap<>();
         kwargs.put("hours", Int.getInt(-24));
+        kwargs.put("milliseconds", Int.getInt(-1));
+        kwargs.put("minutes", Int.getInt(-2));
 
         TimeDelta delta = new TimeDelta(args, kwargs);
 
-        assertDelta(-2, 0, 0, delta);
+        assertDelta(-3, 86279, 999000, delta);
 
-        assertEquals(new Str("-2 days, 0:00:00"), delta.__str__());
+        assertEquals(new Str("-3 days, 23:57:59.999000"), delta.__str__());
     }
 
     @Test
@@ -392,17 +394,17 @@ public class TimeDeltaTests {
         TimeDelta b = createDelta(0, 0, 0, 0, 0, 0, 0);
         assertFalse(a.__ne__(b).toBoolean());
 
-        a = createDelta(0, 0, 0, 0, 0, 1, 0);
-        b = createDelta(0, 0, 0, 0, 0, 1, 0);
-        assertFalse(a.__ne__(b).toBoolean());
+        a = createDelta(1, 0, 0, 0, 0, 0, 0);
+        b = createDelta(0, 0, 0, 0, 0, 0, 0);
+        assertTrue(a.__ne__(b).toBoolean());
 
-        a = createDelta(1, 0, 0, 0, 0, 1, 0);
-        b = createDelta(1, 0, 0, 0, 0, 1, 0);
-        assertFalse(a.__ne__(b).toBoolean());
+        a = createDelta(1, 0, 0, 0, 0, 0, 0);
+        b = createDelta(1, 1, 0, 0, 0, 0, 0);
+        assertTrue(a.__ne__(b).toBoolean());
 
-        a = createDelta(1, 0, 0, 0, 0, 24, 0);
-        b = createDelta(2, 0, 0, 0, 0, 0, 0);
-        assertFalse(a.__ne__(b).toBoolean());
+        a = createDelta(1, 1, 0, 0, 0, 0, 0);
+        b = createDelta(1, 1, 1, 0, 0, 0, 0);
+        assertTrue(a.__ne__(b).toBoolean());
     }
 
     @Test
