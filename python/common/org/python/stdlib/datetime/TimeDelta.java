@@ -359,7 +359,7 @@ public class TimeDelta extends org.python.types.Object {
         long total = (((org.python.types.Int) this.days).value) * 24 * 3600 * 1000000;
         total += (((org.python.types.Int) this.seconds).value * 1000000);
         total += (((org.python.types.Int) this.microseconds).value);
-        return new org.python.types.Float(total / 1000.0);
+        return new org.python.types.Float(total / 1000000.0);
     }
 
     @org.python.Method(__doc__ = "Adds another TimeDelta and returns the resulting TimeDelta", args = {"other"})

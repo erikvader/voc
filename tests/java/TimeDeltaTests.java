@@ -238,6 +238,25 @@ public class TimeDeltaTests {
     }
 
     @Test
+    public void Test_total_seconds_Expect_Correct(){
+        TimeDelta a = createDelta(1, 1, 1, 0, 0, 0, 0);
+        assertEquals(new Float(86401.000001), a.total_seconds());
+    }
+
+    @Test(expected = TypeError.class)
+    public void Test_AddTDWithString_ExpectError(){
+        Object[] args = {
+            Int.getInt(2),
+            Int.getInt(2),
+            Int.getInt(2)
+        };
+
+        TimeDelta TD = new TimeDelta(args, TimeDelta.EMPTY_KWARGS);
+
+        TimeDelta TDRes = TD.__add__(new Str("test"));
+    }
+
+    @Test
     public void Test_AddTDWithPositiveValues_Expect_ValidTimeDelta(){
         Object[] args = {
             Int.getInt(2),
@@ -464,6 +483,24 @@ public class TimeDeltaTests {
             () -> createDelta(-1000000000, 0, 0, 0, 0, 0, 0)
         );
         assertEquals("days=-1000000000; must have magnitude <= 999999999", error.getMessage());
+    }
+
+    @Test
+    public void Test_daysTD_ExpectCorrect(){
+        TimeDelta a = createDelta(1, 0, 0, 0, 0, 0, 0);
+        assertEquals(Int.getInt(1), a.__days__());
+    }
+
+    @Test
+    public void Test_secondsTD_ExpectCorrect(){
+        TimeDelta a = createDelta(0, 1, 0, 0, 0, 0, 0);
+        assertEquals(Int.getInt(1), a.__seconds__());
+    }
+
+    @Test
+    public void Test_microsecondsTD_ExpectCorrect(){
+        TimeDelta a = createDelta(0, 0, 1, 0, 0, 0, 0);
+        assertEquals(Int.getInt(1), a.__microseconds__());
     }
 
     @Test
