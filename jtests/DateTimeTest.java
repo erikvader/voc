@@ -4,6 +4,9 @@ import org.python.stdlib.datetime.DateTime;
 import org.python.exceptions.ValueError;
 import org.python.exceptions.TypeError;
 import org.python.types.Int;
+
+import python.datetime;
+
 import java.util.Map;
 import java.util.HashMap;
 
@@ -201,5 +204,17 @@ public class DateTimeTest {
         assertEquals(dt.minute, Int.getInt(4));
         assertEquals(dt.second, Int.getInt(5));
         assertEquals(dt.microsecond, Int.getInt(10));
+    }
+
+    @Test
+    public void testWeekday() {
+        Map<String, org.python.Object> kwargs = new HashMap<String, org.python.Object>();
+        org.python.Object[] args = {
+            Int.getInt(2020),
+            Int.getInt(9),
+            Int.getInt(28),
+        };
+        DateTime dt = new DateTime(args, kwargs);
+        assertEquals(dt.weekday(),Int.getInt(0));
     }
 }
