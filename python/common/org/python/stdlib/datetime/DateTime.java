@@ -241,10 +241,8 @@ public class DateTime extends org.python.types.Object {
 
 	// Added instance method
 	
-	@org.python.Method(__doc__ = "Return total seconds of ")
+	@org.python.Method(__doc__ = "Return the total number of seconds since 1970, i.e. UNIX time. This assumes that the time is in local time if tzinfo is None.")
 	public org.python.Object timestamp() {
-
-		Calendar now = new java.util.GregorianCalendar();
 
 		int year = (int)this.timeUnits[YEAR_INDEX];
 
@@ -260,22 +258,28 @@ public class DateTime extends org.python.types.Object {
 		
 		int seconds = (int)this.timeUnits[SECOND_INDEX];
 
-		now.set(year,month,day,hour,minute,seconds);
+		Calendar now = new java.util.GregorianCalendar(year,month - 1,day,hour,minute,seconds);
 		now.set(Calendar.MILLISECOND, microsec/1000);
 
-		float totalsec = now.getTimeInMillis();
-		return new org.python.types.Float(totalsec/1000);
+		double totalsec = now.getTimeInMillis() / 1000;
+		return new org.python.types.Float(totalsec);
 
 	}
     
 	// Added class method
 
 	@org.python.Method(__doc__ = "Returns a datetime object based on a iso-formatted input")
-	public static org.python.Object fromisoformat(String isoString) throws ParseException {
+	public static org.python.Object fromisoformat(String isoString) {
 
-	SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");	
-	
-	java.util.Date isodt = sdf.parse(isoString); // create date obj based on iso string
+	SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
+
+	java.util.Date isodt;
+	try {
+		isodt = sdf.parse(isoString); // create date obj based on iso string
+	} catch (ParseException pe) {
+		System.out.println(pe);
+		throw new org.python.exceptions.ValueError("Invalid isoformat string: " + isoString);
+	}
 
 	SimpleDateFormat sdfYear = new SimpleDateFormat("yyyy");
 	SimpleDateFormat sdfMonth = new SimpleDateFormat("MM");
@@ -283,7 +287,7 @@ public class DateTime extends org.python.types.Object {
 	SimpleDateFormat sdfHour = new SimpleDateFormat("HH");
 	SimpleDateFormat sdfMin = new SimpleDateFormat("mm");
 	SimpleDateFormat sdfSec = new SimpleDateFormat("ss");
-	SimpleDateFormat sdfMic = new SimpleDateFormat("SSSXXX");
+	SimpleDateFormat sdfMic = new SimpleDateFormat("SSSSSS");
 
 	String getYear = sdfYear.format(isodt);
 	String getMonth = sdfMonth.format(isodt);
@@ -314,7 +318,7 @@ public class DateTime extends org.python.types.Object {
 
 	}
 
-	@org.python.Method(__doc__ = "Checks if current dateobject is less than dt2 if its 'earlier'")
+	@org.python.Method(__doc__ = "Checks if current dateobject is less than dt")
 	public org.python.types.Object __lt__(DateTime dt) {
 
 		return org.python.types.Bool.getBool(this.compare(dt)==-1);
@@ -333,20 +337,26 @@ public class DateTime extends org.python.types.Object {
 
 	}
 
-	@org.python.Method(__doc__ = "Check if current dateobject is greater and equal than 0")
+	@org.python.Method(__doc__ = "Check if current dateobject is greater than or equal to dt")
 	public org.python.types.Object __ge__(DateTime dt) {
 
 		return org.python.types.Bool.getBool(this.compare(dt)>= 0);
 
 	}
 
-	@org.python.Method(__doc__ = "Check if current dateobject is greater and equal than 0")
+	@org.python.Method(__doc__ = "Check if current dateobject is less than or equal to dt")
 	public org.python.types.Object __le__(DateTime dt) {
 
 		return org.python.types.Bool.getBool(this.compare(dt)<= 0);
 
 	}
 
+	@org.python.Method(__doc__ = "Check if current dateobject is not equal to dt")
+	public org.python.types.Object __ne__(DateTime dt) {
+
+		return org.python.types.Bool.getBool(this.compare(dt) != 0);
+
+	}
 
 	private int compare(DateTime dt2) {
 
