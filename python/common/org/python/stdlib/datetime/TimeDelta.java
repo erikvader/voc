@@ -364,6 +364,11 @@ public class TimeDelta extends org.python.types.Object {
 
     @org.python.Method(__doc__ = "Adds another TimeDelta and returns the resulting TimeDelta", args = {"other"})
     public TimeDelta __add__(org.python.Object other) {
+        if (!(other instanceof TimeDelta)) {
+            throw new org.python.exceptions.TypeError(
+                "'+' not supported between instances of 'datetime.timedelta' and '" + other.typeName() + "'"
+            );
+        }
         long thisDays = ((org.python.types.Int) this.days).value;
         TimeDelta otherObject = (org.python.stdlib.datetime.TimeDelta) other;
         long otherDays = ((org.python.types.Int) otherObject.days).value;
@@ -472,6 +477,50 @@ public class TimeDelta extends org.python.types.Object {
         org.python.Object[] args = {org.python.types.Int.getInt(absDays),
             org.python.types.Int.getInt(absSeconds),
             org.python.types.Int.getInt(absMicroseconds)};
+
+        return new TimeDelta(args, EMPTY_KWARGS);
+    }
+
+    @org.python.Method(__doc__ = "Delta modulus, returns a timedelta with remainders")
+    public TimeDelta __mod__(org.python.Object otherObject) {
+        if (!(otherObject instanceof TimeDelta)) {
+            throw new org.python.exceptions.TypeError(
+                "'%' not supported between instances of 'datetime.timedelta' and '" + otherObject.typeName() + "'"
+            );
+        }
+
+        TimeDelta other = (org.python.stdlib.datetime.TimeDelta) otherObject;
+        long thisDays = ((org.python.types.Int) this.days).value;
+        long otherDays = ((org.python.types.Int) other.days).value;
+        long thisSeconds = ((org.python.types.Int) this.seconds).value;
+        long otherSeconds = ((org.python.types.Int) other.seconds).value;
+        long thisMicroseconds = ((org.python.types.Int) this.microseconds).value;
+        long otherMicroSeconds = ((org.python.types.Int) other.microseconds).value;
+        long remainderDays;
+        long remainderSeconds;
+        long remainderMicroseconds;
+
+        try {
+            remainderDays = thisDays % otherDays;
+        } catch (Exception ZeroDivisionError) {
+            remainderDays = 0;
+        }
+        try {
+            remainderSeconds = thisSeconds % otherSeconds;
+        } catch (Exception ZeroDivisionError) {
+            remainderSeconds = 0;
+        };
+        try {
+            remainderMicroseconds = thisMicroseconds % otherMicroSeconds;
+        } catch (Exception ZeroDivisionError) {
+            remainderMicroseconds = 0;
+        };
+
+        org.python.Object[] args = {
+            org.python.types.Int.getInt(remainderDays),
+            org.python.types.Int.getInt(remainderSeconds),
+            org.python.types.Int.getInt(remainderMicroseconds),
+        };
 
         return new TimeDelta(args, EMPTY_KWARGS);
     }

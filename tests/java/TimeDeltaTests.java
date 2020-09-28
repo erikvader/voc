@@ -480,4 +480,19 @@ public class TimeDeltaTests {
     public void Test_resolutionTD_Expect_ValidTimeDelta(){
         assertDelta(0, 0, 1, TimeDelta.__resolution__());
     }
+
+    @Test
+    public void Test_modTD_Expect_ValidTimeDelta(){
+        TimeDelta a = createDelta(12, 0, 0, 0, 0, 0, 0);
+        TimeDelta b = createDelta(10, 0, 0, 0, 0, 0, 0);
+
+        assertDelta(2, 0, 0, a.__mod__(b));
+    }
+
+    @Test(expected = TypeError.class)
+    public void Test_modTDWithString_ExpectError(){
+        TimeDelta a = createDelta(12, 0, 0, 0, 0, 0, 0);
+
+        assertDelta(2, 0, 0, a.__mod__(new Str("test")));
+    }
 }
