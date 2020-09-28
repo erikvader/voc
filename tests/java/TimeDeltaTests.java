@@ -311,6 +311,17 @@ public class TimeDeltaTests {
     }
 
     @Test
+    public void Test_StrTD_ExpectCorrect(){
+        TimeDelta a = createDelta(12, 0, 0, 0, 0, 0, 0);
+        TimeDelta b = createDelta(0, 1, 1, 0, 0, 0, 0);
+        TimeDelta c = createDelta(1, 0, 0, 0, 0, 0, 0);
+
+        assertEquals(new Str("12 days, 0:00:00"), a.__str__());
+        assertEquals(new Str("0:00:01.000001"), b.__str__());
+        assertEquals(new Str("1 day, 0:00:00"), c.__str__());
+    }
+
+    @Test
     public void Test_AbsTDPositiveDays_Expect_ValidTimeDelta(){
         Object[] args = {
             Int.getInt(2),
@@ -519,11 +530,27 @@ public class TimeDeltaTests {
     }
 
     @Test
-    public void Test_modTD_Expect_ValidTimeDelta(){
+    public void Test_modTDDays_Expect_ValidTimeDelta(){
         TimeDelta a = createDelta(12, 0, 0, 0, 0, 0, 0);
         TimeDelta b = createDelta(10, 0, 0, 0, 0, 0, 0);
 
         assertDelta(2, 0, 0, a.__mod__(b));
+    }
+
+    @Test
+    public void Test_modTDSeconds_Expect_ValidTimeDelta(){
+        TimeDelta a = createDelta(0, 12, 0, 0, 0, 0, 0);
+        TimeDelta b = createDelta(0, 10, 0, 0, 0, 0, 0);
+
+        assertDelta(0, 2, 0, a.__mod__(b));
+    }
+
+    @Test
+    public void Test_modTDMicroseconds_Expect_ValidTimeDelta(){
+        TimeDelta a = createDelta(0, 0, 12, 0, 0, 0, 0);
+        TimeDelta b = createDelta(0, 0, 10, 0, 0, 0, 0);
+
+        assertDelta(0, 0, 2, a.__mod__(b));
     }
 
     @Test(expected = TypeError.class)

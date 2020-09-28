@@ -396,6 +396,7 @@ public class TimeDelta extends org.python.types.Object {
         return new TimeDelta(args, EMPTY_KWARGS);
     }
 
+    @org.python.Method(__doc__ = "Returns a string of TimeDelta object")
     public org.python.types.Str __str__() {
         long days = ((org.python.types.Int) this.days).value;
         long seconds = ((org.python.types.Int) this.seconds).value;
@@ -509,12 +510,12 @@ public class TimeDelta extends org.python.types.Object {
             remainderSeconds = thisSeconds % otherSeconds;
         } catch (Exception ZeroDivisionError) {
             remainderSeconds = 0;
-        };
+        }
         try {
             remainderMicroseconds = thisMicroseconds % otherMicroSeconds;
         } catch (Exception ZeroDivisionError) {
             remainderMicroseconds = 0;
-        };
+        }
 
         org.python.Object[] args = {
             org.python.types.Int.getInt(remainderDays),
