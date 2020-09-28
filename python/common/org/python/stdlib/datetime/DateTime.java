@@ -4,6 +4,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 
+import org.python.types.Int;
+
+import java.util.Calendar;
 import python.datetime;
 
 public class DateTime extends org.python.types.Object {
@@ -18,7 +21,7 @@ public class DateTime extends org.python.types.Object {
 	private final int MIN_YEAR = 1;
 	private final int MAX_YEAR = 9999;
 
-	private Long[] timeUnits = { 0l, 0l, 0l, 0l, 0l, 0l, 0l };
+	private long[] timeUnits = { 0l, 0l, 0l, 0l, 0l, 0l, 0l };
 
 	@org.python.Attribute
 	public final org.python.Object year;
@@ -237,32 +240,42 @@ public class DateTime extends org.python.types.Object {
 	}
 
 	// Added instance method
-	/*
-	@org.python.Method(__doc__ = "Return a timeobject with that contains the hour,min,sec and microsec of datetime obj")
-	public org.python.Object time() {
+	
+	@org.python.Method(__doc__ = "Return total seconds of ")
+	public org.python.Object timestamp() {
 
-		org.python.Object[] args = { 
-			org.python.types.Int.getInt(this.timeUnits[HOUR_INDEX]),
-			org.python.types.Int.getInt(this.timeUnits[MINUTE_INDEX]),
-			org.python.types.Int.getInt(this.timeUnits[SECOND_INDEX]),
-			org.python.types.Int.getInt(this.timeUnits[MICROSECOND_INDEX]) 
-		};
+		Calendar now = new java.util.GregorianCalendar();
 
-	return new Time(args, Collections.emptyMap());
+		int year = (int)this.timeUnits[YEAR_INDEX];
 
+		int month = (int)this.timeUnits[MONTH_INDEX];
+
+		int day = (int)this.timeUnits[DAY_INDEX];
+
+		int hour = (int)this.timeUnits[HOUR_INDEX];
+
+		int minute = (int)this.timeUnits[MINUTE_INDEX];
+
+		int microsec = (int)this.timeUnits[MICROSECOND_INDEX];
+		
+		int seconds = (int)this.timeUnits[SECOND_INDEX];
+
+		now.set(year,month,day,hour,minute,seconds);
+		now.set(Calendar.MILLISECOND, microsec/1000);
+
+		float totalsec = now.getTimeInMillis();
+		return new org.python.types.Float(totalsec/1000);
 
 	}
-    */
+    
 	// Added class method
 
 	@org.python.Method(__doc__ = "Returns a datetime object based on a iso-formatted input")
-	public org.python.Object fromisoformat(String isoString) throws ParseException {
+	public static org.python.Object fromisoformat(String isoString) throws ParseException {
 
 	SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");	
-
-	// java.util.Date date = Date.from( Instant.parse(isoString));
-	//Date isodt = sdf.parse(isoString);
-	java.util.Date isodt = sdf.parse(isoString); // create date obj
+	
+	java.util.Date isodt = sdf.parse(isoString); // create date obj based on iso string
 
 	SimpleDateFormat sdfYear = new SimpleDateFormat("yyyy");
 	SimpleDateFormat sdfMonth = new SimpleDateFormat("MM");
@@ -280,7 +293,6 @@ public class DateTime extends org.python.types.Object {
 	String getSec = sdfSec.format(isodt);
 	String getMic = sdfMic.format(isodt);
 
-
 	int iYear = Integer.parseInt(getYear);
 	int iMonth = Integer.parseInt(getMonth);
 	int iDay = Integer.parseInt(getDay);
@@ -288,11 +300,6 @@ public class DateTime extends org.python.types.Object {
 	int iMin = Integer.parseInt(getMin);
 	int iSec = Integer.parseInt(getSec);
 	int iMic = Integer.parseInt(getMic);
-
-	//int yea = cal.get(Calendar.YEAR);
-	//org.python.types.Int yea = isodt.getYear();
-	//cal.setTime(isodt);
-	//org.python.types.Int yea = Calendar.get(Calendar.YEAR);
 	
 	org.python.types.Int yea = org.python.types.Int.getInt(iYear);
 	org.python.types.Int mont = org.python.types.Int.getInt(iMonth);
@@ -307,32 +314,54 @@ public class DateTime extends org.python.types.Object {
 
 	}
 
-	// added comparision
-	@org.python.Method(__doc__ = "dt1 is less than dt2 if its 'earlier'")
-	public static org.python.types.Int compare(DateTime dt1, DateTime dt2) {
+	@org.python.Method(__doc__ = "Checks if current dateobject is less than dt2 if its 'earlier'")
+	public org.python.types.Object __lt__(DateTime dt) {
 
-		double year1 = ((org.python.types.Int) dt1.year).value;
-		double year2 = ((org.python.types.Int) dt2.year).value;
-
-		double month1 = ((org.python.types.Int) dt1.month).value;
-		double month2 = ((org.python.types.Int) dt2.month).value;
-
-		double day1 = ((org.python.types.Int) dt1.day).value;
-		double day2 = ((org.python.types.Int) dt2.day).value;
-
-		if (year1 < year2) {
-			return org.python.types.Int.getInt(1);
-		}
-
-		if (month1 < month2 && year1==year2) {
-				return org.python.types.Int.getInt(1);
-			}
-			
-		if (day1 < day2 && month1==month2 && year1==year2) {
-			return org.python.types.Int.getInt(1);
-		}
-
-		return org.python.types.Int.getInt(0);
+		return org.python.types.Bool.getBool(this.compare(dt)==-1);
 	}
 
+	@org.python.Method(__doc__ = "Check if dateobject are equal")
+	public org.python.types.Object __eq__(DateTime dt) {
+
+		return org.python.types.Bool.getBool(this.compare(dt)==0);
+	}
+
+	@org.python.Method(__doc__ = "Check if current dateobject is greater than dt")
+	public org.python.types.Object __gt__(DateTime dt) {
+
+		return org.python.types.Bool.getBool(this.compare(dt)==1);
+
+	}
+
+	@org.python.Method(__doc__ = "Check if current dateobject is greater and equal than 0")
+	public org.python.types.Object __ge__(DateTime dt) {
+
+		return org.python.types.Bool.getBool(this.compare(dt)>= 0);
+
+	}
+
+	@org.python.Method(__doc__ = "Check if current dateobject is greater and equal than 0")
+	public org.python.types.Object __le__(DateTime dt) {
+
+		return org.python.types.Bool.getBool(this.compare(dt)<= 0);
+
+	}
+
+
+	private int compare(DateTime dt2) {
+
+		for (int i=0; i<this.timeUnits.length; i++) {
+			if (this.timeUnits[i] < dt2.timeUnits[i]) {
+
+				return -1;
+			}
+			if (this.timeUnits[i] > dt2.timeUnits[i]) {
+
+				return 1;
+			}
+		
+		}
+
+		return 0;
+	}
 }
