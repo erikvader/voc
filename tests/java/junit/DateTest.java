@@ -1,3 +1,5 @@
+package junit;
+
 import static org.junit.Assert.*;
 import org.junit.Test;
 import org.python.stdlib.datetime.Date;
@@ -171,5 +173,16 @@ public class DateTest {
         assertEquals(d.month, Int.getInt(04));
         assertEquals(d.day, Int.getInt(06));
 
+    }
+
+    @Test
+    public void testCTime() {
+        org.python.Object[] args = {
+            Int.getInt(2002), ///year
+            Int.getInt(12), // month
+            Int.getInt(4), // day
+        };
+        Date d = new Date(args, Collections.EMPTY_MAP);
+        assertEquals(d.ctime(), "Wed Dec 4 00:00:00 2002");
     }
 }
