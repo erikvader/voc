@@ -31,9 +31,9 @@ public class Date extends org.python.types.Object {
     public Date(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
 
 	super();
-
+	
+	int val = args.length + kwargs.size();
 	if (args.length + kwargs.size() > 3) {
-	    int val = args.length + kwargs.size();
 	    throw new org.python.exceptions.TypeError("function takes at most 3 arguments (" + val + " given)");
 	}
 
