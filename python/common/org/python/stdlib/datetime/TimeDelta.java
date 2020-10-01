@@ -433,7 +433,9 @@ public class TimeDelta extends org.python.types.Object {
         try {
             mul = ((org.python.types.Int) multiple).value;
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("Argument needs to be an int, got " + multiple.typeName());
+            throw new org.python.exceptions.TypeError(
+                "'*' not supported between instances of 'datetime.timedelta' and '" + multiple.typeName() + "'"
+            );
         }
 
         long days = ((org.python.types.Int) this.days).value;

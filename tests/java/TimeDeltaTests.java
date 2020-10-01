@@ -202,7 +202,7 @@ public class TimeDeltaTests {
     }
 
     @Test
-    public void Test_multiplyTimeDeltaWithInt_Expect_ValidTimeDelta(){
+    public void When_multiplyTimeDeltaWithInt_Expect_ValidTimeDelta(){
         Object[] args = {
             Int.getInt(2),
             Int.getInt(2),
@@ -215,8 +215,8 @@ public class TimeDeltaTests {
         assertDelta(4, 4, 4, TDres);
     }
 
-    @Test(expected = ValueError.class)
-    public void Test_MultiplyTimeDeltaWithZero_ExpectError() {
+    @Test
+    public void When_MultiplyTimeDeltaWithZero_ExpectError() {
         Object[] args = {
             Int.getInt(2),
             Int.getInt(2),
@@ -224,29 +224,31 @@ public class TimeDeltaTests {
         };
 
         TimeDelta TD = new TimeDelta(args, TimeDelta.EMPTY_KWARGS);
-        TimeDelta TDres = TD.__mul__(Int.getInt(0));
-    }
-
-    @Test(expected = TypeError.class)
-    public void Test_MultiplyTimeDeltaWithString_ExpectError(){
-        Object[] args = {
-            Int.getInt(2),
-            Int.getInt(2),
-            Int.getInt(2)
-        };
-
-        TimeDelta TD = new TimeDelta(args, TimeDelta.EMPTY_KWARGS);
-        TimeDelta TDres = TD.__mul__(new Str("test"));
+        ValueError error = assertThrows(ValueError.class, () -> TD.__mul__(Int.getInt(0)));
+        assertEquals("Argument can't be zero", error.getMessage());
     }
 
     @Test
-    public void Test_total_seconds_Expect_Correct(){
+    public void When_MultiplyTimeDeltaWithString_ExpectError(){
+        Object[] args = {
+            Int.getInt(2),
+            Int.getInt(2),
+            Int.getInt(2)
+        };
+
+        TimeDelta TD = new TimeDelta(args, TimeDelta.EMPTY_KWARGS);
+        TypeError error = assertThrows(TypeError.class, () -> TD.__mul__(new Str("test")));
+        assertEquals("'*' not supported between instances of 'datetime.timedelta' and 'str'", error.getMessage());
+    }
+
+    @Test
+    public void When_TDtotal_seconds_Expect_Correct(){
         TimeDelta a = createDelta(1, 1, 1, 0, 0, 0, 0);
         assertEquals(new Float(86401.000001), a.total_seconds());
     }
 
-    @Test(expected = TypeError.class)
-    public void Test_AddTDWithString_ExpectError(){
+    @Test
+    public void When_AddTDWithString_ExpectError(){
         Object[] args = {
             Int.getInt(2),
             Int.getInt(2),
@@ -255,11 +257,12 @@ public class TimeDeltaTests {
 
         TimeDelta TD = new TimeDelta(args, TimeDelta.EMPTY_KWARGS);
 
-        TimeDelta TDRes = TD.__add__(new Str("test"));
+        TypeError error = assertThrows(TypeError.class, () -> TD.__add__(new Str("test")));
+        assertEquals("'+' not supported between instances of 'datetime.timedelta' and 'str'", error.getMessage());
     }
 
     @Test
-    public void Test_AddTDWithPositiveValues_Expect_ValidTimeDelta(){
+    public void When_AddTDWithPositiveValues_Expect_ValidTimeDelta(){
         Object[] args = {
             Int.getInt(2),
             Int.getInt(2),
@@ -275,7 +278,7 @@ public class TimeDeltaTests {
     }
 
     @Test
-    public void Test_AddTDWithNegativeValues_Expect_ValidTimeDelta(){
+    public void When_AddTDWithNegativeValues_Expect_ValidTimeDelta(){
         Object[] args = {
             Int.getInt(2),
             Int.getInt(2),
@@ -298,7 +301,7 @@ public class TimeDeltaTests {
     }
 
     @Test
-    public void Test_PosTD_Expect_ValidTimeDelta(){
+    public void When_PosTD_Expect_ValidTimeDelta(){
         Object[] args = {
             Int.getInt(2),
             Int.getInt(2),
@@ -313,7 +316,7 @@ public class TimeDeltaTests {
     }
 
     @Test
-    public void Test_StrTD_ExpectCorrect(){
+    public void When_StrTD_ExpectCorrect(){
         TimeDelta a = createDelta(12, 0, 0, 0, 0, 0, 0);
         TimeDelta b = createDelta(0, 1, 1, 0, 0, 0, 0);
         TimeDelta c = createDelta(1, 0, 0, 0, 0, 0, 0);
@@ -324,7 +327,7 @@ public class TimeDeltaTests {
     }
 
     @Test
-    public void Test_AbsTDPositiveDays_Expect_ValidTimeDelta(){
+    public void When_AbsTDPositiveDays_Expect_ValidTimeDelta(){
         Object[] args = {
             Int.getInt(2),
             Int.getInt(2),
@@ -339,7 +342,7 @@ public class TimeDeltaTests {
     }
 
     @Test
-    public void Test_AbsTDNegativeDays_Expect_ValidTimeDelta() {
+    public void When_AbsTDNegativeDays_Expect_ValidTimeDelta() {
         Object[] args = {
             Int.getInt(-2),
             Int.getInt(-2),
@@ -499,40 +502,40 @@ public class TimeDeltaTests {
     }
 
     @Test
-    public void Test_daysTD_ExpectCorrect(){
+    public void When_daysTD_ExpectCorrect(){
         TimeDelta a = createDelta(1, 0, 0, 0, 0, 0, 0);
         assertEquals(Int.getInt(1), a.__days__());
     }
 
     @Test
-    public void Test_secondsTD_ExpectCorrect(){
+    public void When_secondsTD_ExpectCorrect(){
         TimeDelta a = createDelta(0, 1, 0, 0, 0, 0, 0);
         assertEquals(Int.getInt(1), a.__seconds__());
     }
 
     @Test
-    public void Test_microsecondsTD_ExpectCorrect(){
+    public void When_microsecondsTD_ExpectCorrect(){
         TimeDelta a = createDelta(0, 0, 1, 0, 0, 0, 0);
         assertEquals(Int.getInt(1), a.__microseconds__());
     }
 
     @Test
-    public void Test_minTD_Expect_ValidTimeDelta(){
+    public void When_minTD_Expect_ValidTimeDelta(){
         assertDelta(-999999999, 0, 0, TimeDelta.__min__());
     }
 
     @Test
-    public void Test_maxTD_Expect_ValidTimeDelta(){
+    public void When_maxTD_Expect_ValidTimeDelta(){
         assertDelta(999999999, 86399, 999999, TimeDelta.__max__());
     }
 
     @Test
-    public void Test_resolutionTD_Expect_ValidTimeDelta(){
+    public void When_resolutionTD_Expect_ValidTimeDelta(){
         assertDelta(0, 0, 1, TimeDelta.__resolution__());
     }
 
     @Test
-    public void Test_modTDDays_Expect_ValidTimeDelta(){
+    public void When_modTDDays_Expect_ValidTimeDelta(){
         TimeDelta a = createDelta(12, 0, 0, 0, 0, 0, 0);
         TimeDelta b = createDelta(10, 0, 0, 0, 0, 0, 0);
 
@@ -540,7 +543,7 @@ public class TimeDeltaTests {
     }
 
     @Test
-    public void Test_modTDSeconds_Expect_ValidTimeDelta(){
+    public void When_modTDSeconds_Expect_ValidTimeDelta(){
         TimeDelta a = createDelta(0, 12, 0, 0, 0, 0, 0);
         TimeDelta b = createDelta(0, 10, 0, 0, 0, 0, 0);
 
@@ -548,17 +551,18 @@ public class TimeDeltaTests {
     }
 
     @Test
-    public void Test_modTDMicroseconds_Expect_ValidTimeDelta(){
+    public void When_modTDMicroseconds_Expect_ValidTimeDelta(){
         TimeDelta a = createDelta(0, 0, 12, 0, 0, 0, 0);
         TimeDelta b = createDelta(0, 0, 10, 0, 0, 0, 0);
 
         assertDelta(0, 0, 2, a.__mod__(b));
     }
 
-    @Test(expected = TypeError.class)
-    public void Test_modTDWithString_ExpectError(){
+    @Test
+    public void When_modTDWithString_ExpectError(){
         TimeDelta a = createDelta(12, 0, 0, 0, 0, 0, 0);
 
-        assertDelta(2, 0, 0, a.__mod__(new Str("test")));
+        TypeError error = assertThrows(TypeError.class, () -> a.__mod__(new Str("test")));
+        assertEquals("'%' not supported between instances of 'datetime.timedelta' and 'str'", error.getMessage());
     }
 }
