@@ -48,6 +48,14 @@ public class TimeDelta extends org.python.types.Object {
 
     private Duration duration;
 
+    public TimeDelta(org.python.Object[] args) {
+        this(args, EMPTY_KWARGS);
+    }
+
+    public TimeDelta(java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        this(EMPTY_ARGS, kwargs);
+    }
+
     @org.python.Method(__doc__ = "")
     public TimeDelta(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super();
@@ -145,14 +153,14 @@ public class TimeDelta extends org.python.types.Object {
         normalize();
     }
 
-    private double getDouble(String key, org.python.Object object) {
-        try {
-            return ((org.python.types.Float) object.__float__()).value;
-        } catch (Exception ignored) {
-            throw new org.python.exceptions.TypeError(
-                "unsupported type for timedelta " + key + " component: " + object.typeName()
-            );
+    private double getDouble(String key, org.python.Object value) {
+        if (value instanceof org.python.types.Float || value instanceof org.python.types.Int) {
+            return ((org.python.types.Float) value.__float__()).value;
         }
+
+        throw new org.python.exceptions.TypeError(
+            "unsupported type for timedelta " + key + " component: " + value.typeName()
+        );
     }
 
     private void normalize() {

@@ -26,7 +26,7 @@ public class TimeDeltaTests {
         kwargs.put("minutes", new Float(minutes));
         kwargs.put("hours", new Float(hours));
         kwargs.put("weeks", new Float(weeks));
-        return new TimeDelta(TimeDelta.EMPTY_ARGS, kwargs);
+        return new TimeDelta(kwargs);
     }
 
     public static void assertDelta(long days, long seconds, long microseconds, TimeDelta delta) {
@@ -67,7 +67,7 @@ public class TimeDeltaTests {
         kwargs.put("hours", Int.getInt(6));
         kwargs.put("weeks", Int.getInt(7));
 
-        TimeDelta delta = new TimeDelta(TimeDelta.EMPTY_ARGS, kwargs);
+        TimeDelta delta = new TimeDelta(kwargs);
 
         assertDelta(50, 21902, 4003, delta);
 
@@ -92,7 +92,7 @@ public class TimeDeltaTests {
 
         kwargs.clear();
         kwargs.put("seconds", new Float(-1));
-        delta = new TimeDelta(TimeDelta.EMPTY_ARGS, kwargs);
+        delta = new TimeDelta(kwargs);
         assertDelta(-1, 86399, 0, delta);
         assertEquals("-1 day, 23:59:59", delta.__str__().value);
     }
@@ -117,7 +117,7 @@ public class TimeDeltaTests {
         Map<String, Object> kwargs = new HashMap<>();
         kwargs.put("weeks", new Float(1.0 + 1.0 / 7.0));
 
-        TimeDelta delta = new TimeDelta(TimeDelta.EMPTY_ARGS, kwargs);
+        TimeDelta delta = new TimeDelta(kwargs);
 
         assertDelta(8, 0, 0, delta);
     }
@@ -127,7 +127,7 @@ public class TimeDeltaTests {
         Map<String, Object> kwargs = new HashMap<>();
         kwargs.put("abc", Int.getInt(5));
 
-        TypeError error = assertThrows(TypeError.class, () -> new TimeDelta(TimeDelta.EMPTY_ARGS, kwargs));
+        TypeError error = assertThrows(TypeError.class, () -> new TimeDelta(kwargs));
         assertEquals("'abc' is an invalid keyword argument for __new__()", error.getMessage());
     }
 
@@ -136,14 +136,20 @@ public class TimeDeltaTests {
         Map<String, Object> kwargs = new HashMap<>();
         kwargs.put("days", new Str("a"));
 
-        TypeError error = assertThrows(TypeError.class, () -> new TimeDelta(TimeDelta.EMPTY_ARGS, kwargs));
+        TypeError error = assertThrows(TypeError.class, () -> new TimeDelta(kwargs));
         assertEquals("unsupported type for timedelta days component: str", error.getMessage());
 
         kwargs.clear();
         kwargs.put("weeks", new List());
 
-        error = assertThrows(TypeError.class, () -> new TimeDelta(TimeDelta.EMPTY_ARGS, kwargs));
+        error = assertThrows(TypeError.class, () -> new TimeDelta(kwargs));
         assertEquals("unsupported type for timedelta weeks component: list", error.getMessage());
+
+        kwargs.clear();
+        kwargs.put("minutes", new Str("1.15"));
+
+        error = assertThrows(TypeError.class, () -> new TimeDelta(kwargs));
+        assertEquals("unsupported type for timedelta minutes component: str", error.getMessage());
     }
 
     @Test
@@ -223,7 +229,7 @@ public class TimeDeltaTests {
             Int.getInt(2)
         };
 
-        TimeDelta TD = new TimeDelta(args, TimeDelta.EMPTY_KWARGS);
+        TimeDelta TD = new TimeDelta(args);
         ValueError error = assertThrows(ValueError.class, () -> TD.__mul__(Int.getInt(0)));
         assertEquals("Argument can't be zero", error.getMessage());
     }
@@ -236,7 +242,7 @@ public class TimeDeltaTests {
             Int.getInt(2)
         };
 
-        TimeDelta TD = new TimeDelta(args, TimeDelta.EMPTY_KWARGS);
+        TimeDelta TD = new TimeDelta(args);
         TypeError error = assertThrows(TypeError.class, () -> TD.__mul__(new Str("test")));
         assertEquals("'*' not supported between instances of 'datetime.timedelta' and 'str'", error.getMessage());
     }
@@ -255,7 +261,7 @@ public class TimeDeltaTests {
             Int.getInt(2)
         };
 
-        TimeDelta TD = new TimeDelta(args, TimeDelta.EMPTY_KWARGS);
+        TimeDelta TD = new TimeDelta(args);
 
         TypeError error = assertThrows(TypeError.class, () -> TD.__add__(new Str("test")));
         assertEquals("'+' not supported between instances of 'datetime.timedelta' and 'str'", error.getMessage());
@@ -269,8 +275,8 @@ public class TimeDeltaTests {
             Int.getInt(2)
         };
 
-        TimeDelta TD = new TimeDelta(args, TimeDelta.EMPTY_KWARGS);
-        TimeDelta TD2 = new TimeDelta(args, TimeDelta.EMPTY_KWARGS);
+        TimeDelta TD = new TimeDelta(args);
+        TimeDelta TD2 = new TimeDelta(args);
 
         TimeDelta TDRes = TD.__add__(TD2);
 
@@ -292,8 +298,8 @@ public class TimeDeltaTests {
         };
 
 
-        TimeDelta TD = new TimeDelta(args, TimeDelta.EMPTY_KWARGS);
-        TimeDelta TD2 = new TimeDelta(negArgs, TimeDelta.EMPTY_KWARGS);
+        TimeDelta TD = new TimeDelta(args);
+        TimeDelta TD2 = new TimeDelta(negArgs);
 
         TimeDelta TDRes = TD.__add__(TD2);
 
@@ -308,7 +314,7 @@ public class TimeDeltaTests {
             Int.getInt(2)
         };
 
-        TimeDelta TD = new TimeDelta(args, TimeDelta.EMPTY_KWARGS);
+        TimeDelta TD = new TimeDelta(args);
 
         TimeDelta TDPos = TD.__pos__();
 
@@ -334,7 +340,7 @@ public class TimeDeltaTests {
             Int.getInt(2)
         };
 
-        TimeDelta TD = new TimeDelta(args, TimeDelta.EMPTY_KWARGS);
+        TimeDelta TD = new TimeDelta(args);
 
         TimeDelta TDabs = TD.__abs__();
 
@@ -349,7 +355,7 @@ public class TimeDeltaTests {
             Int.getInt(-2)
         };
 
-        TimeDelta TD = new TimeDelta(args, TimeDelta.EMPTY_KWARGS);
+        TimeDelta TD = new TimeDelta(args);
 
         TimeDelta TDabs = TD.__abs__();
 
@@ -361,11 +367,11 @@ public class TimeDeltaTests {
         Map<String, Object> kwargs = new HashMap<>();
         kwargs.put("microseconds", new Float(0.5));
 
-        TimeDelta delta = new TimeDelta(TimeDelta.EMPTY_ARGS, kwargs);
+        TimeDelta delta = new TimeDelta(kwargs);
         assertDelta(0, 0, 0, delta);
 
         kwargs.put("microseconds", new Float(0.51));
-        delta = new TimeDelta(TimeDelta.EMPTY_ARGS, kwargs);
+        delta = new TimeDelta(kwargs);
         assertDelta(0, 0, 1, delta);
     }
 
