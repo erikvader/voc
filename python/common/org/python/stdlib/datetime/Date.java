@@ -17,7 +17,13 @@ public class Date extends org.python.types.Object {
     public static final org.python.Object min = __min__();
 
     @org.python.Attribute
-    public static final org.python.Object max = __max__();
+	public static final org.python.Object max = __max__();
+	
+	private int MIN_YEAR = 1;
+	private int MAX_YEAR = 9999;
+	private int MIN_MONTH = 1;
+	private int MAX_MONTH = 12;
+	private int[] DAYS_IN_MONTH = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 	@org.python.Method(__doc__ = 
 	"A date object represents a date (year, month and day) in an idealized calendar, \n"
@@ -53,23 +59,9 @@ public class Date extends org.python.types.Object {
 		this.day = kwargs.get("day");
 	    } else {
 		this.day = args[2];
-	    }
-
-	    if ((this.year instanceof org.python.types.Int) && (this.month instanceof org.python.types.Int) && (this.day instanceof org.python.types.Int)) {
-		if (1 <= ((org.python.types.Int) this.year).value && ((org.python.types.Int) this.year).value <= 9999) {
-
-		    if (1 <= ((org.python.types.Int) this.month).value && ((org.python.types.Int) this.month).value <= 12) {
-			if (1 <= ((org.python.types.Int) this.day).value && ((org.python.types.Int) this.day).value <= 31) {
-			} else {
-			    throw new org.python.exceptions.ValueError("day is out of range for month");
-			}
-		    } else {
-			throw new org.python.exceptions.ValueError("month must be in 1..12");
-		    }
-		} else {
-		    throw new org.python.exceptions.ValueError("year " + this.year + " is out of range");
 		}
-	    } else {
+
+
 		if (!(this.year instanceof org.python.types.Int)) {
 		    throw new org.python.exceptions.TypeError("integer argument expected, got " + this.year.typeName());
 		}
@@ -79,7 +71,22 @@ public class Date extends org.python.types.Object {
 		if (!(this.day instanceof org.python.types.Int)) {
 		    throw new org.python.exceptions.TypeError("integer argument expected, got " + this.day.typeName());
 		}
-	    }
+		
+		int year = (int) ((org.python.types.Int) this.year).value;
+		int month = (int) ((org.python.types.Int) this.month).value;
+		int day = (int) ((org.python.types.Int) this.day).value;
+
+		if ( year < MIN_YEAR || year > MAX_YEAR) {
+			throw new org.python.exceptions.ValueError("year " + this.year + " is out of range");
+		}
+		
+		if ( month < MIN_MONTH || month > MAX_MONTH) {
+			throw new org.python.exceptions.ValueError("month must be in 1..12");
+		}
+
+		if ( day < 1 || day > DAYS_IN_MONTH[month-1]) {
+			throw new org.python.exceptions.ValueError("day is out of range for month: " + this.day);
+		}
 	}
 
 	if (args.length + kwargs.size() == 2) {
@@ -277,7 +284,7 @@ public class Date extends org.python.types.Object {
 	double weekdayNum = ((org.python.types.Int) weekday()).value;
 	String weekdayStr = weekdayList[(int) weekdayNum];
 
-	return new org.python.types.Str(weekdayStr + " " + monthStr + "  " + this.day + " 00:00:00 " + this.year);
+	return new org.python.types.Str(weekdayStr + " " + monthStr + " " + this.day + " 00:00:00 " + this.year);
     }
 
     @org.python.Method(__doc__ = "Return the day of the week as an integer, where Monday is 0 and Sunday is 6. ")
