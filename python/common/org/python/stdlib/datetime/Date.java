@@ -89,87 +89,8 @@ public class Date extends org.python.types.Object {
 		}
 	}
 
-	if (args.length + kwargs.size() == 2) {
-
-	    if (args.length == 2) {
-		this.year = args[0];
-		this.month = args[1];
-	    }
-
-	    if (kwargs.get("year") != null) {
-		this.year = kwargs.get("year");
-	    } else if (args.length > 0) {
-		this.year = args[0];
-	    }
-
-	    if (kwargs.get("month") != null) {
-		this.month = kwargs.get("month");
-	    }
-	    if (kwargs.get("day") != null) {
-		this.day = kwargs.get("day");
-	    }
-
-	    String y = this.year + "";
-	    String m = this.month + "";
-	    String d = this.day + "";
-
-	    if (!y.equals("null") && !(this.year instanceof org.python.types.Int)) {
-		throw new org.python.exceptions.TypeError("intege argument expected, got " + this.year.typeName());
-	    }
-	    if (kwargs.get("year") != null && args.length > 0) {
-		throw new org.python.exceptions.SyntaxError("positional argument follows keyword argument");
-	    }
-
-	    if (!(this.month instanceof org.python.types.Int) && !m.equals("null")) {
-		throw new org.python.exceptions.TypeError("integer argument expected, got " + this.month.typeName());
-	    }
-
-	    if (y.equals("null")) {
-
-		throw new org.python.exceptions.TypeError("function missing required argument 'year' (pos 1)");
-	    }
-
-	    if (m.equals("null")) {
-
-		throw new org.python.exceptions.TypeError("function missing required argument 'month' (pos 2)");
-	    }
-	    if (d.equals("null")) {
-		throw new org.python.exceptions.TypeError("function missing required argument 'day' (pos 3)");
-	    }
-	}
-
-	if (args.length + kwargs.size() == 1) {
-	    if (kwargs.get("year") != null) {
-		this.year = kwargs.get("year");
-	    } else if (args.length > 0) {
-		this.year = args[0];
-	    }
-	    if (kwargs.get("month") != null) {
-		this.month = kwargs.get("month");
-	    }
-
-	    if (kwargs.get("day") != null) {
-		this.day = kwargs.get("day");
-	    }
-
-	    String y = this.year + "";
-	    String m = this.month + "";
-	    String d = this.day + "";
-
-	    if (!(this.year instanceof org.python.types.Int) && !y.equals("null")) {
-		throw new org.python.exceptions.TypeError("integer argument expected, got " + this.year.typeName());
-
-	    }
-	    if (!y.equals("null")) {
-		throw new org.python.exceptions.TypeError("function missing required argument 'month' (pos 2)");
-	    }
-	    if (!m.equals("null") || !d.equals("null")) {
-		throw new org.python.exceptions.TypeError("function missing required argument 'year' (pos 1)");
-	    }
-
-	}
-	if (args.length + kwargs.size() == 0) {
-	    throw new org.python.exceptions.TypeError("function missing required argument 'year' (pos 1)");
+	if (args.length + kwargs.size() < 3) {
+	    throw new org.python.exceptions.TypeError("function missing required arguments, required 3 got " + (args.length + kwargs.size()));
 	}
 
     }
