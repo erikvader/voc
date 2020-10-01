@@ -61,9 +61,7 @@ public class DateTime extends org.python.types.Object {
 			if (kwargs.get(key) != null) {
 				this.timeUnits[keyIndex] = ((org.python.types.Int) kwargs.get(key)).value;
 				kwargsIsUsed = true;
-			} else if (args.length > argIndex) {
-				if (kwargsIsUsed)
-					throw new org.python.exceptions.SyntaxError("positional argument follows keyword argument");
+			} else if (args.length > argIndex) {		
 				this.timeUnits[keyIndex] = ((org.python.types.Int) args[argIndex]).value;
 				argIndex++;
 			} else if (keyIndex < 3) {

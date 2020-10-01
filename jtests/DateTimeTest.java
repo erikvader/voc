@@ -4,6 +4,7 @@ import org.python.stdlib.datetime.DateTime;
 import org.python.exceptions.ValueError;
 import org.python.exceptions.TypeError;
 import org.python.types.Int;
+import org.python.types.Float;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -239,5 +240,23 @@ public class DateTimeTest {
         assertEquals(dt.second, dt.__second__());
         assertEquals(dt.microsecond, dt.__microsecond__());
     }
+
+    
+    @Test (expected = ClassCastException.class)
+    public void testFloatsAsElements()  {
+        
+        Map<String, org.python.Object> kwargs = new HashMap<String, org.python.Object>();
+        Float fl1 = new Float(3);
+        Float fl2 = new Float(4);
+        Float fl3 = new Float(5);
+        org.python.Object[] args = {
+            fl1,
+            fl2,
+            fl3,
+        };
+        DateTime dt = new DateTime(args, kwargs);
+        
+    }
+    
     
 }
