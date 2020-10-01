@@ -20,6 +20,7 @@ public class DateTime extends org.python.types.Object {
 
 	private final int MIN_YEAR = 1;
 	private final int MAX_YEAR = 9999;
+	private final int[] MONTH_MAX = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 	private long[] timeUnits = { 0l, 0l, 0l, 0l, 0l, 0l, 0l };
 
@@ -78,6 +79,7 @@ public class DateTime extends org.python.types.Object {
 		if (this.timeUnits[MONTH_INDEX] < 1 || this.timeUnits[MONTH_INDEX] > 12) {
 			throw new org.python.exceptions.ValueError("month " + this.timeUnits[MONTH_INDEX] + "is out of range");
 		}
+
 		if (this.timeUnits[DAY_INDEX] < 1 || this.timeUnits[DAY_INDEX] > 31) {
 			throw new org.python.exceptions.ValueError("day " + this.timeUnits[DAY_INDEX] + "is out of range");
 		}
@@ -97,6 +99,14 @@ public class DateTime extends org.python.types.Object {
 		if (this.timeUnits[MICROSECOND_INDEX] < 0 || this.timeUnits[MICROSECOND_INDEX] > 1000000) {
 			throw new org.python.exceptions.ValueError(
 					"microsecond " + this.timeUnits[MICROSECOND_INDEX] + "is out of range");
+		}
+
+		int days_max = 29;
+		if (this.timeUnits[MONTH_INDEX] != 2 || !this.is_leap_year()) {
+			days_max = this.MONTH_MAX[(int)this.timeUnits[MONTH_INDEX]-1];
+		}
+		if (this.timeUnits[DAY_INDEX] > days_max) {
+			throw new org.python.exceptions.ValueError("day is out of range for month");
 		}
 
 		this.year = __year__();
@@ -371,5 +381,10 @@ public class DateTime extends org.python.types.Object {
 		}
 
 		return 0;
+	}
+
+	private boolean is_leap_year() {
+		long y = this.timeUnits[YEAR_INDEX];
+		return (y % 4 == 0 && y % 100 != 0) || y % 400 == 0;
 	}
 }

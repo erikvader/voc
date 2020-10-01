@@ -241,10 +241,9 @@ public class DateTimeTest {
         assertEquals(dt.microsecond, dt.__microsecond__());
     }
 
-    
     @Test (expected = ClassCastException.class)
     public void testFloatsAsElements()  {
-        
+
         Map<String, org.python.Object> kwargs = new HashMap<String, org.python.Object>();
         Float fl1 = new Float(3);
         Float fl2 = new Float(4);
@@ -255,8 +254,33 @@ public class DateTimeTest {
             fl3,
         };
         DateTime dt = new DateTime(args, kwargs);
-        
+
     }
-    
-    
+
+    private void assertMonthInRange(int year, int month, int day, boolean shouldFail) {
+        Map<String, org.python.Object> kwargs = new HashMap<String, org.python.Object>();
+        org.python.Object[] args = {
+            Int.getInt(year),
+            Int.getInt(month),
+            Int.getInt(day),
+        };
+        try{
+            new DateTime(args, kwargs);
+            if (shouldFail) fail("expected exception didn't occur");
+        } catch (ValueError ve) {
+            if (!shouldFail) throw ve;
+            assertEquals(ve.getMessage(), "day is out of range for month");
+        }
+    }
+
+    @Test
+    public void testMonthLimits() {
+        assertMonthInRange(2020, 2, 29, false);
+        assertMonthInRange(2021, 2, 29, true);
+        assertMonthInRange(2020, 2, 31, true);
+        assertMonthInRange(2021, 2, 31, true);
+        assertMonthInRange(2021, 1, 31, false);
+        assertMonthInRange(2021, 1, 30, false);
+    }
+
 }
