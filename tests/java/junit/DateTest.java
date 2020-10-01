@@ -119,7 +119,7 @@ public class DateTest {
 
     @Test
     public void testKwargs() {
-        Map kwargs = new HashMap<java.lang.String, org.python.Object>();
+        Map<java.lang.String, org.python.Object> kwargs = new HashMap();
         kwargs.put("year", Int.getInt(2020));
         kwargs.put("month", Int.getInt(10));
         kwargs.put("day", Int.getInt(24));
@@ -183,6 +183,6 @@ public class DateTest {
             Int.getInt(4), // day
         };
         Date d = new Date(args, Collections.EMPTY_MAP);
-        assertEquals(d.ctime(), "Wed Dec 4 00:00:00 2002");
+        assertEquals(d.ctime(), new Str("Wed Dec 4 00:00:00 2002"));
     }
 }
