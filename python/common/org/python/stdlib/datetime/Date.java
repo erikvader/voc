@@ -277,11 +277,11 @@ public class Date extends org.python.types.Object {
     public org.python.Object ctime() {
 
 	String[] monthList = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-	double monthNum = ((org.python.types.Int) this.month).value;
+	long monthNum = ((org.python.types.Int) this.month).value;
 	String monthStr = monthList[(int) monthNum - 1];
 
 	String[] weekdayList = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
-	double weekdayNum = ((org.python.types.Int) weekday()).value;
+	long weekdayNum = ((org.python.types.Int) weekday()).value;
 	String weekdayStr = weekdayList[(int) weekdayNum];
 
 	return new org.python.types.Str(weekdayStr + " " + monthStr + " " + this.day + " 00:00:00 " + this.year);
@@ -289,9 +289,9 @@ public class Date extends org.python.types.Object {
 
     @org.python.Method(__doc__ = "Return the day of the week as an integer, where Monday is 0 and Sunday is 6. ")
     public org.python.Object weekday() {
-	double y = ((org.python.types.Int) this.year).value;
-	double m = ((org.python.types.Int) this.month).value;
-	double d = ((org.python.types.Int) this.day).value;
+	long y = ((org.python.types.Int) this.year).value;
+	long m = ((org.python.types.Int) this.month).value;
+	long d = ((org.python.types.Int) this.day).value;
 
 	java.util.Date myCalendar = new java.util.GregorianCalendar((int) y, (int) m - 1, (int) d).getTime();
 	java.util.Calendar c = java.util.Calendar.getInstance();
