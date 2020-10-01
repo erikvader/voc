@@ -19,7 +19,9 @@ public class Date extends org.python.types.Object {
     @org.python.Attribute
     public static final org.python.Object max = __max__();
 
-    @org.python.Method(__doc__ = "")
+	@org.python.Method(__doc__ = 
+	"A date object represents a date (year, month and day) in an idealized calendar, \n"
+	+ "the current Gregorian calendar indefinitely extended in both directions.")
     public Date(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
 
 	super();
@@ -165,7 +167,7 @@ public class Date extends org.python.types.Object {
 
     }
 
-    @org.python.Method(__doc__ = "")
+    @org.python.Method(__doc__ = "Return datestring")
     public org.python.types.Str __repr__() {
 
 	String year = this.year + "";
@@ -183,26 +185,22 @@ public class Date extends org.python.types.Object {
 	return new org.python.types.Str(year + "-" + month + "-" + day);
     }
 
-    public static org.python.Object constant_4() {
-	return org.python.types.Int.getInt(4);
-    }
-
-    @org.python.Method(__doc__ = "")
+    @org.python.Method(__doc__ = "Return year as string")
     public org.python.types.Str __year__() {
 	return new org.python.types.Str(this.year + "");
     }
 
-    @org.python.Method(__doc__ = "")
+    @org.python.Method(__doc__ = "Return month as string")
     public org.python.types.Str __month__() {
 	return new org.python.types.Str(this.month + "");
     }
 
-    @org.python.Method(__doc__ = "")
+    @org.python.Method(__doc__ = "Return day as string")
     public org.python.types.Str __day__() {
 	return new org.python.types.Str(this.day + "");
     }
 
-    @org.python.Method(__doc__ = "")
+    @org.python.Method(__doc__ = "Return max date")
     private static org.python.Object __max__() {
 
 	org.python.types.Int day = org.python.types.Int.getInt(31);
@@ -213,7 +211,7 @@ public class Date extends org.python.types.Object {
 	return new Date(args, Collections.emptyMap());
     }
 
-    @org.python.Method(__doc__ = "")
+    @org.python.Method(__doc__ = "Return min date")
 
     private static org.python.Object __min__() {
 	org.python.types.Int day = org.python.types.Int.getInt(1);
@@ -225,7 +223,7 @@ public class Date extends org.python.types.Object {
 
     }
 
-    @org.python.Method(__doc__ = "")
+    @org.python.Method(__doc__ = "Return the current local date.")
     public static org.python.Object today() {
 	java.time.LocalDateTime today = java.time.LocalDateTime.now();
 	int y = today.getYear();
@@ -236,7 +234,7 @@ public class Date extends org.python.types.Object {
 	return new Date(args, Collections.emptyMap());
 	}
 
-	@org.python.Method(__doc__ = "")
+	@org.python.Method(__doc__ = "Return a date corresponding to a date_string given in the format YYYY-MM-DD")
 	public static Date fromisoformat(org.python.types.Str string) {
 		String[] str = string.value.split("-");
 		int year = Integer.parseInt(str[0]);
@@ -246,7 +244,7 @@ public class Date extends org.python.types.Object {
 		return new Date(args, Collections.emptyMap());
 	}
 
-	@org.python.Method(__doc__ = "")
+	@org.python.Method(__doc__ = "Check if date is before this.date")
 	public org.python.types.Bool before(Date d) {
 		java.util.Calendar d1 = java.util.Calendar.getInstance();
 		d1.set( (int)((org.python.types.Int) this.year).value, (int)((org.python.types.Int) this.month).value, (int)((org.python.types.Int) this.day).value);
@@ -257,7 +255,7 @@ public class Date extends org.python.types.Object {
 		else return org.python.types.Bool.FALSE;
 	}
 
-	@org.python.Method(__doc__ = "")
+	@org.python.Method(__doc__ = "Check if date is after this.date")
 	public org.python.types.Bool after(Date d) {
 		java.util.Calendar d1 = java.util.Calendar.getInstance();
 		d1.set( (int)((org.python.types.Int) this.year).value, (int)((org.python.types.Int) this.month).value, (int)((org.python.types.Int) this.day).value);
@@ -268,7 +266,7 @@ public class Date extends org.python.types.Object {
 		else return org.python.types.Bool.FALSE;
 	}
 
-    @org.python.Method(__doc__ = "")
+    @org.python.Method(__doc__ = "Return a string representing the date")
     public org.python.Object ctime() {
 
 	String[] monthList = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
@@ -282,7 +280,7 @@ public class Date extends org.python.types.Object {
 	return new org.python.types.Str(weekdayStr + " " + monthStr + "  " + this.day + " 00:00:00 " + this.year);
     }
 
-    @org.python.Method(__doc__ = "")
+    @org.python.Method(__doc__ = "Return the day of the week as an integer, where Monday is 0 and Sunday is 6. ")
     public org.python.Object weekday() {
 	double y = ((org.python.types.Int) this.year).value;
 	double m = ((org.python.types.Int) this.month).value;
@@ -296,7 +294,8 @@ public class Date extends org.python.types.Object {
 	return org.python.types.Int.getInt(convertToPython[day - 1]);
 
 	}
-	
+
+	@org.python.Method(__doc__ = "Return the day of the week as an integer, where Monday is 1 and Sunday is 7.")
 	public org.python.Object isoweekday() {
 		org.python.types.Int dayOfWeek = (org.python.types.Int) weekday();
 		return org.python.types.Int.getInt(dayOfWeek.value + 1);
