@@ -241,17 +241,13 @@ public class DateTimeTest {
         assertEquals(dt.microsecond, dt.__microsecond__());
     }
 
-    @Test (expected = ClassCastException.class)
+    @Test (expected = TypeError.class)
     public void testFloatsAsElements()  {
-
         Map<String, org.python.Object> kwargs = new HashMap<String, org.python.Object>();
-        Float fl1 = new Float(3);
-        Float fl2 = new Float(4);
-        Float fl3 = new Float(5);
         org.python.Object[] args = {
-            fl1,
-            fl2,
-            fl3,
+            new Float(3),
+            new Float(4),
+            new Float(5),
         };
         DateTime dt = new DateTime(args, kwargs);
 

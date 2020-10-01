@@ -54,15 +54,17 @@ public class DateTime extends org.python.types.Object {
 	public DateTime(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
 		super();
 		String[] keys = { "year", "month", "day", "hour", "minute", "second", "microsecond" };
-		boolean kwargsIsUsed = false;
 		int keyIndex = 0;
 		int argIndex = 0;
 
 		for (String key : keys) {
 			if (kwargs.get(key) != null) {
+				if (!(kwargs.get(key) instanceof org.python.types.Int))
+					throw new org.python.exceptions.TypeError("an integer is required, got " + kwargs.get(key).typeName());
 				this.timeUnits[keyIndex] = ((org.python.types.Int) kwargs.get(key)).value;
-				kwargsIsUsed = true;
-			} else if (args.length > argIndex) {		
+			} else if (args.length > argIndex) {
+				if (!(args[argIndex] instanceof org.python.types.Int))
+					throw new org.python.exceptions.TypeError("an integer is required, got " + args[argIndex].typeName());
 				this.timeUnits[keyIndex] = ((org.python.types.Int) args[argIndex]).value;
 				argIndex++;
 			} else if (keyIndex < 3) {
