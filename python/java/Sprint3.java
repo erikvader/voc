@@ -11,7 +11,7 @@ public class Sprint3 {
         DateTime today = (DateTime) DateTime.today();
 
         for (String iso : isoDateTimes) {
-            DateTime dateTime = (DateTime) DateTime.fromisoformat(iso);
+            DateTime dateTime = (DateTime) DateTime.fromisoformat2(iso);
             if (dateTime.__gt__(today).toBoolean()) {
                 count++;
             }

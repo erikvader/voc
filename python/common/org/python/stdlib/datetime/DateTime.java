@@ -328,6 +328,50 @@ public class DateTime extends org.python.types.Object {
 
 	}
 
+	@org.python.Method(__doc__ = "Version 2 of fromisoformat")
+	public static org.python.Object fromisoformat2(String isoString) {
+		
+		SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS"); 
+  
+        try { 
+            Calendar cal = Calendar.getInstance(); 
+			 
+			cal.setTime(SDF.parse(isoString));
+			
+			org.python.types.Int yea = org.python.types.Int.getInt(cal.get(Calendar.YEAR));
+			org.python.types.Int mont = org.python.types.Int.getInt(cal.get(Calendar.MONTH));
+			org.python.types.Int da = org.python.types.Int.getInt(cal.get(Calendar.DAY_OF_MONTH));
+			org.python.types.Int hou = org.python.types.Int.getInt(cal.get(Calendar.HOUR));
+			org.python.types.Int minut = org.python.types.Int.getInt(cal.get(Calendar.MINUTE));
+			org.python.types.Int secon = org.python.types.Int.getInt(cal.get(Calendar.SECOND));
+			org.python.types.Int microsecon = org.python.types.Int.getInt((cal.get(Calendar.MILLISECOND))/1000); 
+			
+			org.python.Object[] args = { yea, mont, da, hou, minut, secon, microsecon };
+			return new DateTime(args, Collections.emptyMap());
+        } 
+        catch (ParseException exception) { 
+            throw new RuntimeException("Knas"); 
+		}
+		
+		/*
+		String getYear = cal.getYear(); 
+		String getMonth = cal.getMonth();
+		String getDay = cal.getDay();
+		String getHour = cal.getHour();
+		String getMin = cal.getMinute();
+		String getSec = cal.getSecond();
+		String getMic = cal.getMicrosecond();
+		
+		int iYear = Integer.parseInt(getYear);
+		int iMonth = Integer.parseInt(getMonth);
+		int iDay = Integer.parseInt(getDay);
+		int iHour = Integer.parseInt(getHour);
+		int iMin = Integer.parseInt(getMin);
+		int iSec = Integer.parseInt(getSec);
+		int iMic = Integer.parseInt(getMic);
+		*/
+	}
+
 	@org.python.Method(__doc__ = "Checks if current dateobject is less than dt")
 	public org.python.types.Object __lt__(DateTime dt) {
 
