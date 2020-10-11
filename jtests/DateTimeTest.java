@@ -279,4 +279,24 @@ public class DateTimeTest {
         assertMonthInRange(2021, 1, 30, false);
     }
 
+    @Test (expected = RuntimeException.class)
+    public void testInvalidformat2() {      
+        DateTime dt = (DateTime) DateTime.fromisoformat2("197001020");    
+
+    }
+
+    @Test
+    public void testIsoformat2() {
+        DateTime dt = (DateTime) DateTime.fromisoformat2("1970-01-02T03:04:05.000010");
+
+        assertEquals(dt.year, Int.getInt(1970));
+        assertEquals(dt.month, Int.getInt(1));
+        assertEquals(dt.day, Int.getInt(2));
+        assertEquals(dt.hour, Int.getInt(3));
+        assertEquals(dt.minute, Int.getInt(4));
+        assertEquals(dt.second, Int.getInt(5));
+        assertEquals(dt.microsecond, Int.getInt(0));
+        
+    }
+
 }
