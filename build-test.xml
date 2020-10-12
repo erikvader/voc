@@ -56,19 +56,20 @@
       <fileset dir="." includes="TEST-*.txt" />
     </delete>
   </target>
-
+  <!-- classpath="/opt/jprofiler/bin/ant.jar" -->
   <taskdef name="profile"
            classname="com.jprofiler.ant.ProfileTask"
-           classpath="/opt/jprofiler/bin/ant.jar"/>
+           classpath="/Applications/JProfiler.app/Contents/Resources/app/bin/ant.jar"
+           />
 
   <target name="profile" depends="build">
-    <profile classname="OrderedDictWorkload" offline="true" sessionid="80">
+    <profile classname="OrderedDictWorkload" offline="true" sessionid="1337" configfile="jprofiler_config/config.xml">
       <classpath>
         <pathelement location="${build}/jtests" />
         <pathelement location="${build}/java" />
         <fileset dir="lib" includes="*.jar" />
+        <fileset dir="dist" includes="*.jar" />
       </classpath>
     </profile>
   </target>
-
 </project>
