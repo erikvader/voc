@@ -43,6 +43,10 @@
     <ant antfile="build-test.xml" target="test" />
   </target>
 
+  <target name="profile" depends="java">
+    <ant antfile="build-test.xml" target="profile" />
+  </target>
+
   <target name="android">
     <ant antfile="build-android.xml" target="dist"/>
   </target>
