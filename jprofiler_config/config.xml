@@ -92,9 +92,9 @@ if (session != null) {
         <group type="exclusive" name="Default excludes" template="defaultExcludes" />
       </filters>
     </session>
-    <session id="1337" name="OrderedDict" type="launch" jvmConfigurationId="100" mainClass="bezier.BezierAnim" userInitRequired="true">
+    <session id="1337" name="OrderedDict" type="launch" jvmConfigurationId="100" mainClass="OrderedDictWorkload" recordArrayAlloc="false" compilationTarget="1.8" recordingProfileId="10">
       <filters>
-        <filter type="inclusive" name="bezier." />
+        <filter type="inclusive" name="OrderedDict" />
       </filters>
       <triggers logTarget="stdout" logFile="">
         <jvmStart groupId="1337" useGroupId="true" descriptionType="manual" manualDescription="JVM STARTED">
@@ -122,12 +122,18 @@ if (session != null) {
         </jvmStop>
       </triggers>
       <classPath>
-        <entry path="demo/bezier/classes" />
+        <entry path="/Users/filipnystrand/Skola/maintenace_programming/voc/build/jtests" />
+        <entry path="/Users/filipnystrand/Skola/maintenace_programming/voc/dist" />
+        <entry path="/Users/filipnystrand/Skola/maintenace_programming/voc/dist/python-java-support.jar" />
+        <entry path="/Users/filipnystrand/Skola/maintenace_programming/voc/build/java" />
       </classPath>
       <sourcePath>
-        <entry path="demo/bezier/src" />
+        <entry path="/Users/filipnystrand/Skola/maintenace_programming/voc/dist" />
       </sourcePath>
+      <libraryPath>
+        <entry path="/Users/filipnystrand/Skola/maintenace_programming/voc/dist" />
+      </libraryPath>
     </session>
   </sessions>
-  <nextId id="105" />
+  <nextId id="1338" />
 </config>
