@@ -10,10 +10,11 @@ package org.python.stdlib.collections;
 // TODO: uncomment and remove this line from `test_collections.py`: "Different type prior to Python 3.5"
 
 public class OrderedDict extends org.python.types.Dict {
+    public java.util.List<org.python.Object> lvalue;
 
     private OrderedDict() {
         super();
-        this.value = new java.util.LinkedHashMap<org.python.Object, org.python.Object>();
+        this.lvalue = new java.util.ArrayList<>();
     }
 
     @org.python.Method(
@@ -22,15 +23,18 @@ public class OrderedDict extends org.python.types.Dict {
     )
     public OrderedDict(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (args[0] == null) {
-            this.value = new java.util.LinkedHashMap<>();
+            this.value = new java.util.HashMap<>();
+            this.lvalue = new java.util.ArrayList<>();
         } else {
             if (args[0] instanceof org.python.types.Dict) {
-                this.value = new java.util.LinkedHashMap<>(
+                this.value = new java.util.HashMap<>(
                     ((org.python.types.Dict) args[0]).value
                 );
+                this.lvalue = new java.util.ArrayList<>(this.value.keySet());
             } else {
                 org.python.Object iterator = org.Python.iter(args[0]);
-                java.util.Map<org.python.Object, org.python.Object> generated = new java.util.LinkedHashMap<>();
+                java.util.Map<org.python.Object, org.python.Object> generated = new java.util.HashMap<>();
+                java.util.List<org.python.Object> lgenerated = new java.util.ArrayList<>();
                 try {
                     while (true) {
                         org.python.Object next = iterator.__next__();
@@ -58,16 +62,19 @@ public class OrderedDict extends org.python.types.Dict {
                         }
 
                         generated.put(data.get(0), data.get(1));
+                        lgenerated.add(data.get(0));
                     }
                 } catch (org.python.exceptions.StopIteration si) {
                 }
                 this.value = generated;
+                this.lvalue = lgenerated;
             }
         }
 
         for (java.util.Map.Entry<java.lang.String, org.python.Object> entry : kwargs.entrySet()) {
             org.python.types.Str key = new org.python.types.Str(entry.getKey());
             this.value.put(key, entry.getValue());
+            this.lvalue.add(key);
         }
     }
 
@@ -80,7 +87,7 @@ public class OrderedDict extends org.python.types.Dict {
         } else {
             java.lang.StringBuilder buffer = new java.lang.StringBuilder("OrderedDict([");
             boolean first = true;
-            for (org.python.Object key : this.value.keySet()) {
+            for (org.python.Object key : this.lvalue) {
                 if (first) {
                     first = false;
                 } else {
@@ -109,9 +116,7 @@ public class OrderedDict extends org.python.types.Dict {
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.stdlib.collections.OrderedDict) {
             org.python.stdlib.collections.OrderedDict od = (org.python.stdlib.collections.OrderedDict) other;
-            return org.python.types.Bool.getBool(java.util.Arrays.equals(
-                this.value.entrySet().toArray(), od.value.entrySet().toArray()
-            ));
+            return org.python.types.Bool.getBool(this.value.equals(od.value) && this.lvalue.equals(od.lvalue));
         } else {
             return super.__eq__(other);
         }
@@ -136,8 +141,9 @@ public class OrderedDict extends org.python.types.Dict {
     )
     public org.python.Object copy() {
         org.python.stdlib.collections.OrderedDict od = new org.python.stdlib.collections.OrderedDict();
-        for (org.python.Object key: this.value.keySet()) {
+        for (org.python.Object key: this.lvalue) {
             od.value.put(key, this.value.get(key));
+            od.lvalue.add(key);
         }
 
         return od;
@@ -206,11 +212,13 @@ public class OrderedDict extends org.python.types.Dict {
         }
 
         org.python.Object key;
-        org.python.Object[] keys = this.value.keySet().toArray(new org.python.Object[this.value.size()]);
         if (last == null || ((org.python.types.Bool) last).value) {
-            key = keys[this.value.size() - 1];
+            int last_index  = this.lvalue.size() - 1;
+            key = this.lvalue.get(last_index);
+            this.lvalue.remove(last_index);
         } else {
-            key = keys[0];
+            key = this.lvalue.get(0);
+            this.lvalue.remove(0);
         }
 
         org.python.Object value = this.value.remove(key);
@@ -236,7 +244,7 @@ public class OrderedDict extends org.python.types.Dict {
                     try {
                         org.python.Object key = iterator.__next__();
                         org.python.Object value = kwargs.value.get(key);
-                        this.value.put(key, value);
+                        this.__setitem__(key, value);
                     } catch (org.python.exceptions.StopIteration si) {
                         break;
                     }
@@ -248,7 +256,7 @@ public class OrderedDict extends org.python.types.Dict {
                 try {
                     org.python.Object key = iterator.__next__();
                     org.python.Object value = iterable.__getitem__(key);
-                    this.value.put(key, value);
+                    this.__setitem__(key, value);
                 } catch (org.python.exceptions.StopIteration si) {
                     break;
                 }
@@ -279,7 +287,7 @@ public class OrderedDict extends org.python.types.Dict {
 
                     org.python.Object key = pair.get(0);
                     org.python.Object value = pair.get(1);
-                    this.value.put(key, value);
+                    this.__setitem__(key, value);
                 } catch (org.python.exceptions.StopIteration si) {
                     break;
                 }
@@ -299,15 +307,37 @@ public class OrderedDict extends org.python.types.Dict {
             default_args = {"last"}
     )
     public void move_to_end(org.python.Object key, org.python.Object last) {
+        //TODO: this implementation sucks now, plz fix!
         org.python.Object value = this.pop(key, null);
 
         if (last == null || ((org.python.types.Bool) last).value) {
             this.__setitem__(key, value);
         } else {
-            java.util.LinkedHashMap<org.python.Object, org.python.Object> map = new java.util.LinkedHashMap<>();
+            java.util.HashMap<org.python.Object, org.python.Object> map = new java.util.HashMap<>();
             map.put(key, value);
             map.putAll(this.value);
             this.value = map;
+
+            java.util.List<org.python.Object> list = new java.util.ArrayList<>();
+            list.add(key);
+            list.addAll(this.lvalue);
+            this.lvalue = list;
         }
+    }
+
+    @Override
+    public void __setitem__(org.python.Object item, org.python.Object value) {
+        super.__setitem__(item, value);
+        if (this.value.size() > this.lvalue.size()) {
+            this.lvalue.add(item);
+        }
+    }
+
+    public org.python.Object pop(org.python.Object k, org.python.Object d) {
+        org.python.Object ret = super.pop(k, d);
+        if (this.value.size() < this.lvalue.size()) {
+            this.lvalue.remove(k);
+        }
+        return ret;
     }
 }
