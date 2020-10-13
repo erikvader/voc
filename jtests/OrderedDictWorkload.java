@@ -8,12 +8,15 @@ public class OrderedDictWorkload {
         HashMap<String, org.python.Object> kwargs = new HashMap<String, org.python.Object>();
         OrderedDict dict = new OrderedDict(args, kwargs);
 
-        for(int i = 0; i < 500000; i++){
+        for(int i = 0; i < 30000; i++){
             dict.__setitem__(Int.getInt(i), Int.getInt(i));
         }
 
-        for(int i = 0; i < 500000; i++){
-            dict.__delitem__(dict.get(Int.getInt(i), Int.getInt(i)));
+        dict.__reversed__();
+
+        for(int i = 0; i < 30000; i++){
+            dict.popitem();
         }
+
     }
 }
