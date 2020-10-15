@@ -412,27 +412,23 @@ public class TimeDelta extends org.python.types.Object {
 
         Duration duration = Duration.ofDays(days)
                 .plus(Duration.ofSeconds(seconds).plus(Duration.ofNanos(microseconds * 1000)));
-
-        StringBuilder sb = new StringBuilder();
-        if (Math.abs(days) > 0) {
-            sb.append(days);
-            sb.append(" day");
-            if (Math.abs(days) > 1) {
-                sb.append("s");
-            }
-            sb.append(", ");
-        }
         Duration hours = duration.minusDays(days);
-        sb.append(hours.toHours());
-        sb.append(":");
         Duration minutes = hours.minusHours(hours.toHours());
-        sb.append(String.format("%02d", minutes.toMinutes()));
-        sb.append(":");
-        sb.append(String.format("%02d", minutes.minusMinutes(minutes.toMinutes()).toSeconds()));
-        if (microseconds > 0) {
-            sb.append(String.format(".%06d", microseconds));
-        }
-        return new org.python.types.Str(sb.toString());
+
+  
+        String day = Long.toString(days);
+  
+        String hour = String.format("%02d", hours.toHours());
+        
+        String minute = String.format("%02d", minutes.toMinutes());
+      
+        String second = String.format("%02d", minutes.minusMinutes(minutes.toMinutes()).toSeconds());
+      
+        String microsecond = String.format(".%06d", microseconds);
+
+        String returnStr = day + ',' + hour + ':' + minute + ':' + second + microsecond;
+
+        return new org.python.types.Str(returnStr);
     }
 
     @org.python.Method(__doc__ = "Delta multiplied by an integer, integer can't be zero", args = {"multiple"})
