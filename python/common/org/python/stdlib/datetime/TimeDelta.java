@@ -415,18 +415,31 @@ public class TimeDelta extends org.python.types.Object {
         Duration hours = duration.minusDays(days);
         Duration minutes = hours.minusHours(hours.toHours());
 
-  
-        String day = Long.toString(days);
-  
-        String hour = String.format("%02d", hours.toHours());
-        
-        String minute = String.format("%02d", minutes.toMinutes());
-      
-        String second = String.format("%02d", minutes.minusMinutes(minutes.toMinutes()).toSeconds());
-      
-        String microsecond = String.format(".%06d", microseconds);
+        String day = "";
 
-        String returnStr = day + ',' + hour + ':' + minute + ':' + second + microsecond;
+        if (Math.abs(days) > 0){
+            day = Long.toString(days) + " day, ";
+            if(Math.abs(days) > 1){
+                day = Long.toString(days) + " days, ";
+            }
+        }
+
+        String hour = String.format("%01d", hours.toHours());
+        if(Math.abs(hours.toHours()) > 9){
+            hour = String.format("%02d", hours.toHours());
+        }
+
+
+        String minute = String.format("%02d", minutes.toMinutes());
+
+        String second = String.format("%02d", minutes.minusMinutes(minutes.toMinutes()).toSeconds());
+
+        String microsecond = "";
+        if(microseconds > 0){
+            microsecond = String.format(".%06d", microseconds);
+        }
+
+        String returnStr = day + hour + ':' + minute + ':' + second + microsecond;
 
         return new org.python.types.Str(returnStr);
     }
